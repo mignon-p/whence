@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 VERS=`perl -e 'while (<>) { print $1 if (/#define\s+CMD_VERSION\s+"(.*?)"/); }' whence.h`
 
