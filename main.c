@@ -5,7 +5,8 @@
 int main (int argc, char **argv) {
     if (argc > 1) {
         char *result;
-        const ErrorCode ec = getAttribute (argv[1], "com.apple.quarantine", &result);
+        size_t length;
+        const ErrorCode ec = getAttribute (argv[1], "com.apple.quarantine", &result, &length);
         if (ec == EC_OK) {
             printf ("%s\n", result);
         } else if (ec == EC_MEM) {

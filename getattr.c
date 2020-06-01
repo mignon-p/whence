@@ -41,8 +41,10 @@ static ErrorCode errnum2ec (int errnum) {
 
 ErrorCode getAttribute (const char *fname,
                         const char *attr,
-                        char **result) {
+                        char **result,
+                        size_t *length) {
     *result = NULL;
+    *length = 0;
 
     const ssize_t ret1 = call_getxattr (fname, attr, NULL, 0);
     ssize_t ret2 = ret1;
@@ -60,14 +62,21 @@ ErrorCode getAttribute (const char *fname,
         const char *errmsg = strerror (errnum);
         free (*result);
         *result = strdup (errmsg);
+        if (*result) {
+            *length = strlen (*result);
+        }
         return (*result ? errnum2ec (errnum) : EC_MEM);
     }
 
     if (ret1 != ret2) {
         free (*result);
         *result = strdup ("attribute size mismatch");
+        if (*result) {
+            *length = strlen (*result);
+        }
         return (*result ? EC_OTHER : EC_MEM);
     }
 
+    *length = ret2;
     return EC_OK;
 }

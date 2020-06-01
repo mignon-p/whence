@@ -12,6 +12,7 @@ typedef enum ErrorCode {
 
 ErrorCode getAttribute (const char *fname,
                         const char *attr,
-                        char **result);
+                        char **result,
+                        size_t *length);
 
 #endif  /* WHENCE_H */
