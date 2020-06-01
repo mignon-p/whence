@@ -1,6 +1,8 @@
 #ifndef WHENCE_H
 #define WHENCE_H
 
+#include <stddef.h>
+
 typedef enum ErrorCode {
     EC_OK = 0,
     EC_NOATTR = 1,
@@ -14,5 +16,7 @@ ErrorCode getAttribute (const char *fname,
                         const char *attr,
                         char **result,
                         size_t *length);
+
+ErrorCode printProps (const void *data, size_t length);
 
 #endif  /* WHENCE_H */
