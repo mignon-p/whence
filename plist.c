@@ -1,10 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <CoreFoundation/CFData.h>
 #include <CoreFoundation/CFPropertyList.h>
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFNumber.h>
+#include <CoreFoundation/CFNumberFormatter.h>
 
 #include "whence.h"
+
+void printPlist (CFPropertyListRef plist, uintptr_t indent);
 
 static void printString (CFStringRef str) {
     size_t buflen = CFStringGetLength (str) * 4 + 1;
@@ -37,16 +42,16 @@ static void printNumber (CFNumberRef num) {
 }
 
 static void arrApp (const void *value, void *context) {
-    printPlist (value, (int) context);
+    printPlist (value, (uintptr_t) context);
 }
 
-void printArray (CFArrayRef a, int indent) {
+static void printArray (CFArrayRef a, uintptr_t indent) {
     const CFIndex count = CFArrayGetCount (a);
     CFArrayApplyFunction (a, CFRangeMake (0, count), arrApp, (void *) indent);
 }
 
-ErrorCode printPlist (CFPropertyListRef plist, int indent) {
-    int i;
+void printPlist (CFPropertyListRef plist, uintptr_t indent) {
+    uintptr_t i;
 
     for (i = 0; i < indent; i++) {
         printf ("  ");
@@ -54,7 +59,7 @@ ErrorCode printPlist (CFPropertyListRef plist, int indent) {
 
     if (plist == NULL) {
         printf ("NULL\n");
-        return EC_OK;
+        return;
     }
 
     const CFTypeID t = CFGetTypeID (plist);
@@ -105,7 +110,7 @@ ErrorCode printProps (const void *data, size_t length) {
         return EC_OTHER;
     }
 
-    const ErrorCode ret = printPlist (plist, 0);
+    printPlist (plist, 0);
     CFRelease (plist);
-    return ret;
+    return EC_OK;
 }
