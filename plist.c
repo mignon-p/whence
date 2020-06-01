@@ -114,3 +114,38 @@ ErrorCode printProps (const void *data, size_t length) {
     CFRelease (plist);
     return EC_OK;
 }
+
+static void checkArray (CFPropertyListRef plist, const char *filename) {
+    const CFTypeID t = CFGetTypeID (plist);
+
+    if (t != CFArrayGetTypeID() || 2 != CFArrayGetCount (plist)) {
+        printf ("%s:\n", filename);
+        printPlist (plist, 1);
+    }
+}
+
+void checkProps (const void *data, size_t length, const char* filename) {
+    CFDataRef d = CFDataCreate (NULL, data, length);
+    if (d == NULL) {
+        return;
+    }
+
+    CFErrorRef err = NULL;
+    CFPropertyListRef plist =
+        CFPropertyListCreateWithData (NULL, d, kCFPropertyListImmutable,
+                                      NULL, &err);
+    CFRelease (d);
+    if (plist == NULL) {
+        CFStringRef msg = CFErrorCopyDescription (err);
+        printf ("%s: ", filename);
+        printString (msg);
+        printf ("\n");
+        CFRelease (msg);
+        CFRelease (err);
+        return;
+    }
+
+    checkArray (plist, filename);
+    CFRelease (plist);
+}
+

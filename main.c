@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if 0
 int main (int argc, char **argv) {
     if (argc > 1) {
         char *result = NULL;
@@ -42,4 +43,26 @@ int main (int argc, char **argv) {
     }
 
     return EC_CMDLINE;
+}
+#endif
+
+int main (int argc, char **argv) {
+    int i;
+
+    for (i = 1; i < argc; i++) {
+        const char *filename = argv[i];
+        char *result = NULL;
+        size_t length = 0;
+
+        const ErrorCode ec2 =
+            getAttribute (argv[1], "com.apple.metadata:kMDItemWhereFroms",
+                          &result, &length);
+        if (ec2 == EC_OK) {
+            checkProps (result, length, filename);
+        }
+
+        free (result);
+    }
+
+    return 0;
 }

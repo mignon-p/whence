@@ -19,4 +19,6 @@ ErrorCode getAttribute (const char *fname,
 
 ErrorCode printProps (const void *data, size_t length);
 
+void checkProps (const void *data, size_t length, const char* filename);
+
 #endif  /* WHENCE_H */
