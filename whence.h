@@ -39,4 +39,26 @@ void AL_cleanup (ArrayList *al);
 
 ErrorCode props2list (const void *data, size_t length, ArrayList *dest);
 
+void split (const char *str, const char *sep, ArrayList *dest);
+
+typedef struct Attributes {
+    char *url;
+    char *referrer;
+    char *application;
+    time_t date;
+    char *error;
+} Attributes;
+
+typedef enum AttrStyle {
+    AS_HUMAN,
+    AS_JSON_NOTLAST,
+    AS_JSON_LAST
+} AttrStyle;
+
+void Attr_init (Attributes *attrs);
+void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style);
+void Attr_cleanup (Attributes *attrs);
+
+ErrorCode getAttributes (const char *fname, Attributes *dest);
+
 #endif  /* WHENCE_H */
