@@ -4,14 +4,69 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 
-static void parse_quarantine (Attributes *dest, const char *s) {
+static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
     ArrayList al;
 
     AL_init (&al);
     split (s, ";", &al);
 
-    TODO;
+    if (al.size != 4) {
+        if (dest->error == NULL) {
+            char buf[80];
+            snprintf (buf, sizeof (buf),
+                      "Expected 4 fields in com.apple.quarantine, but got %lu",
+                      (unsigned long) al.size);
+            dest->error = strdup (buf);
+            CHECK_NULL (dest->error);
+        }
+
+        AL_cleanup (&al);
+        return EC_OTHER;
+    }
+
+    const char *hexdate = al.strings[1];
+    const char *application = al.strings[2];
+    const char *uuid = al.strings[3];
+
+    char *endptr = NULL;
+    errno = 0;
+    const unsigned long long date = strtoull (hexdate, &endptr, 16);
+    const int errnum = errno;
+    if (errnum != 0 || *hexdate == 0 || *endptr != 0) {
+        char buf[80];
+        if (dest->error == NULL) {
+            if (errnum != 0) {
+                dest->error = strdup (strerror (errnum));
+            } else {
+                snprintf (buf, sizeof (buf),
+                          "'%s' is not a valid hex number.", hexdate);
+                dest->error = buf;
+            }
+
+            CHECK_NULL (dest->error);
+        }
+
+        AL_cleanup (&al);
+        return EC_OTHER;
+    } else {
+        dest->date = (time_t) date;
+    }
+
+    if (dest->application == NULL) {
+        dest->application = strdup (application);
+        CHECK_NULL (dest->application);
+    }
+
+    ErrorCode ret = EC_OK;
+    if (*uuid) {
+        // ret = lookup_uuid (dest, uuid);
+    }
+
+    AL_cleanup (&al);
+    return ret;
 }
 
 static ErrorCode parse_wherefroms (Attributes *dest,
@@ -24,7 +79,7 @@ static ErrorCode parse_wherefroms (Attributes *dest,
     if (ec != EC_OK) {
         if (dest->error == NULL) {
             dest->error =
-                strdup (al.size == 1 ? a.strings[0] : "Unknown error");
+                strdup (al.size == 1 ? al.strings[0] : "Unknown error");
             CHECK_NULL (dest->error);
         }
 
@@ -69,7 +124,7 @@ ErrorCode getAttributes (const char *fname, Attributes *dest) {
     ErrorCode ec1 = getAttribute (fname, "com.apple.quarantine",
                                   &result, &length);
     if (ec1 == EC_OK) {
-        parse_quarantine (dest, result);
+        ec1 = parse_quarantine (dest, result);
     } else if (ec1 != EC_NOATTR) {
         dest->error = result;   /* transfer ownership */
         result = NULL;
