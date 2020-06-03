@@ -144,9 +144,7 @@ ErrorCode getAttributes (const char *fname, Attributes *dest) {
             result = NULL;
         }
 
-        if (ec2 > ec1) {
-            ec1 = ec2;
-        }
+        ec1 = combineErrors (ec1, ec2);
 
         free (result);
         result = NULL;

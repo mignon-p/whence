@@ -2,67 +2,89 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
-#if 0
-int main (int argc, char **argv) {
-    if (argc > 1) {
-        char *result = NULL;
-        size_t length = 0;
-
-        const ErrorCode ec1 = getAttribute (argv[1], "com.apple.quarantine",
-                                            &result, &length);
-        if (ec1 == EC_OK) {
-            printf ("%s\n", result);
-        } else if (ec1 == EC_MEM) {
-            fprintf (stderr, "Out of memory\n");
-        } else {
-            fprintf (stderr, "%s\n", result);
-        }
-
-        free (result);
-        result = NULL;
-
-        const ErrorCode ec2 =
-            getAttribute (argv[1], "com.apple.metadata:kMDItemWhereFroms",
-                          &result, &length);
-        if (ec2 == EC_OK) {
-            printProps (result, length);
-        } else if (ec2 == EC_MEM) {
-            fprintf (stderr, "Out of memory\n");
-        } else {
-            fprintf (stderr, "%s\n", result);
-        }
-
-        free (result);
-
-        if (ec1 > ec2) {
-            return ec1;
-        } else {
-            return ec2;
-        }
-    }
-
-    return EC_CMDLINE;
+static void print_usage (void) {
+    fprintf (stderr, "Usage: " CMD_NAME " [OPTIONS] FILE ...\n\n");
+    fprintf (stderr, "%-30s%s\n",
+             "  -j, --json",
+             "Print results in JSON format.");
+    fprintf (stderr, "%-30s%s\n",
+             "  -h, --help",
+             "Print this message and exit.");
+    fprintf (stderr, "%-30s%s\n",
+             "  -v, --version",
+             "Print the version number of " CMD_NAME " and exit.");
 }
-#endif
+
+static void print_version (void) {
+    fprintf (stderr, CMD_NAME " 0.9\n");
+}
+
+static bool is_option (const char *arg, const char *opt1, const char *opt2) {
+    if (0 == strcmp (arg, opt1)) {
+        return true;
+    } else if (0 == strcmp (arg, opt2)) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 int main (int argc, char **argv) {
-    int i;
+    bool json = false;
+    int arg1 = 1;
 
-    for (i = 1; i < argc; i++) {
-        const char *filename = argv[i];
-        char *result = NULL;
-        size_t length = 0;
-
-        const ErrorCode ec2 =
-            getAttribute (argv[1], "com.apple.metadata:kMDItemWhereFroms",
-                          &result, &length);
-        if (ec2 == EC_OK) {
-            checkProps (result, length, filename);
-        }
-
-        free (result);
+    if (arg1 < argc && is_option (argv[arg1], "-j", "--json")) {
+        json = true;
+        arg1++;
     }
 
-    return 0;
+    if (arg1 < argc && is_option (argv[arg1], "-h", "--help")) {
+        print_usage ();
+        return EC_OK;
+    }
+
+    if (arg1 < argc && is_option (argv[arg1], "-v", "--version")) {
+        print_version ();
+        return EC_OK;
+    }
+
+    Attributes attr;
+    Attr_init (&attr);
+
+    bool first = true;
+    ErrorCode ec = EC_OK;
+
+    if (json) {
+        printf ("{\n");
+    }
+
+    for ( ; arg1 < argc; arg1++) {
+        const char *fname = argv[arg1];
+        const ErrorCode ec2 = getAttributes (fname, &attr);
+        AttrStyle style = AS_HUMAN;
+
+        if (json) {
+            style = (argc == arg1 + 1 ? AS_JSON_LAST : AS_JSON_NOTLAST);
+        }
+
+        Attr_print (&attr, fname, style);
+        Attr_cleanup (&attr);
+
+        if (first) {
+            ec = ec2;
+        } else {
+            ec = combineErrors (ec, ec2);
+        }
+
+        first = false;
+    }
+
+    if (json) {
+        printf ("}\n");
+    }
+
+    return ec;
 }

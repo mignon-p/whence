@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <time.h>
 
+#define CMD_NAME "whence"
+
 typedef enum ErrorCode {
     EC_OK = 0,
     EC_NOATTR = 1,
@@ -61,5 +63,7 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style);
 void Attr_cleanup (Attributes *attrs);
 
 ErrorCode getAttributes (const char *fname, Attributes *dest);
+
+ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2);
 
 #endif  /* WHENCE_H */
