@@ -13,11 +13,12 @@ static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
     AL_init (&al);
     split (s, ";", &al);
 
-    if (al.size != 4) {
+    if (al.size < 3) {
         if (dest->error == NULL) {
             char buf[80];
             snprintf (buf, sizeof (buf),
-                      "Expected 4 fields in com.apple.quarantine, but got %lu",
+                      "Expected at least 3 fields in com.apple.quarantine, "
+                      "but got %lu",
                       (unsigned long) al.size);
             dest->error = strdup (buf);
             CHECK_NULL (dest->error);
@@ -29,7 +30,10 @@ static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
 
     const char *hexdate = al.strings[1];
     const char *application = al.strings[2];
-    const char *uuid = al.strings[3];
+    const char *uuid = NULL;
+    if (al.size > 3) {
+        uuid = al.strings[3];
+    }
 
     char *endptr = NULL;
     errno = 0;
@@ -61,7 +65,7 @@ static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
     }
 
     ErrorCode ret = EC_OK;
-    if (*uuid) {
+    if (uuid && *uuid) {
         // ret = lookup_uuid (dest, uuid);
     }
 

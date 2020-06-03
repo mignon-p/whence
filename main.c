@@ -63,6 +63,12 @@ int main (int argc, char **argv) {
 
     for ( ; arg1 < argc; arg1++) {
         const char *fname = argv[arg1];
+
+        if (fname == NULL) {
+            fprintf (stderr, "fname is NULL in main()\n");
+            return 10;
+        }
+
         const ErrorCode ec2 = getAttributes (fname, &attr);
         AttrStyle style = AS_HUMAN;
 
