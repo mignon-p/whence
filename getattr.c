@@ -50,10 +50,8 @@ ErrorCode getAttribute (const char *fname,
     ssize_t ret2 = ret1;
 
     if (ret1 >= 0) {
-        *result = malloc (ret1);
-        if (*result == NULL) {
-            return EC_MEM;
-        }
+        *result = malloc (ret1 + 1); /* leave room for NUL terminator */
+        CHECK_NULL (*result);
         ret2 = call_getxattr (fname, attr, *result, ret1);
     }
 
@@ -62,20 +60,22 @@ ErrorCode getAttribute (const char *fname,
         const char *errmsg = strerror (errnum);
         free (*result);
         *result = strdup (errmsg);
-        if (*result) {
-            *length = strlen (*result);
-        }
-        return (*result ? errnum2ec (errnum) : EC_MEM);
+        CHECK_NULL (*result);
+        *length = strlen (*result);
+        return errnum2ec (errnum);
     }
 
     if (ret1 != ret2) {
         free (*result);
         *result = strdup ("attribute size mismatch");
-        if (*result) {
-            *length = strlen (*result);
-        }
-        return (*result ? EC_OTHER : EC_MEM);
+        CHECK_NULL (*result);
+        *length = strlen (*result);
+        return EC_OTHER;
     }
+
+    /* NUL terminate (not included in length) to make
+     * working with strings easier. */
+    result[ret2] = 0;
 
     *length = ret2;
     return EC_OK;
