@@ -2,6 +2,7 @@
 #define WHENCE_H
 
 #include <stddef.h>
+#include <time.h>
 
 typedef enum ErrorCode {
     EC_OK = 0,

@@ -1,6 +1,7 @@
 #include "whence.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 void split (const char *str, const char *sep, ArrayList *dest) {
     char *s = strdup (str);

@@ -1,6 +1,11 @@
 #include "whence.h"
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdbool.h>
+#include <time.h>
 
 typedef struct Printer {
     void (*print_fname) (const char *fname);
@@ -11,25 +16,70 @@ typedef struct Printer {
 } Printer;
 
 static void human_print_fname (const char *fname) {
+    printf ("%s:\n", fname);
 }
 
 static void human_print_field (const char *field,
                                const char *value,
                                bool *firstField) {
+    printf ("  %-11s %s\n", field, value);
 }
 
 static void human_print_end (bool lastFile) {
+    /* do nothing */
+}
+
+static void print_string (const char *s, bool forceLC) {
+    putchar ('"');
+
+    char c;
+    while (0 != (c = *(s++))) {
+        if (forceLC) {
+            c = tolower (c);
+        }
+
+        if (c == '"') {
+            printf ("\\\"");
+        } else if (c == '\\') {
+            printf ("\\\\");
+        } else if (c < ' ') {
+            printf ("\\u%04X", c);
+        } else {
+            putchar (c);
+        }
+    }
+
+    putchar ('"');
 }
 
 static void json_print_fname (const char *fname) {
+    printf ("  ");
+    print_string (fname, false);
+    printf (": {");
 }
 
 static void json_print_field (const char *field,
                               const char *value,
                               bool *firstField) {
+    if (*firstField == true) {
+        *firstField = false;
+    } else {
+        printf (",");
+    }
+
+    printf ("\n    ");
+    print_string (field, true);
+    printf (": ");
+    print_string (value, false);
 }
 
 static void json_print_end (bool lastFile) {
+    printf ("\n  }");
+    if (lastFile) {
+        printf ("\n");
+    } else {
+        printf (",\n");
+    }
 }
 
 static const Printer printer_human = {
@@ -48,11 +98,11 @@ void Attr_init (Attributes *attrs) {
     memset (attrs, 0, sizeof (*attrs));
 }
 
-#define PR(field, value, error) \
-    if (value) p->print_field (field, value, &firstField, error)
+#define PR(field, value) \
+    if (value) p->print_field (field, value, &firstField)
 
 void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
-    const Printer *p = (style == AS_HUMAN ? printer_human : printer_json);
+    const Printer *p = (style == AS_HUMAN ? &printer_human : &printer_json);
     const bool lastFile = (style == AS_JSON_LAST);
     bool firstField = true;
 
