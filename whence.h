@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define CMD_NAME "whence"
 
@@ -64,5 +65,7 @@ void Attr_cleanup (Attributes *attrs);
 ErrorCode getAttributes (const char *fname, Attributes *dest);
 
 ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2);
+
+bool enableColorEscapes (int fd);
 
 #endif  /* WHENCE_H */

@@ -69,7 +69,9 @@ int main (int argc, char **orig_argv) {
     bool first = true;
     ErrorCode ec = EC_OK;
 
-    const bool tty = isatty (STDOUT_FILENO);
+    const bool colorize = (!json &&
+                           isatty (STDOUT_FILENO) &&
+                           enableColorEscapes (STDOUT_FILENO));
     if (NULL == setlocale (LC_TIME, "")) {
         perror ("setlocale");
     }
@@ -81,7 +83,7 @@ int main (int argc, char **orig_argv) {
     for ( ; arg1 < argc; arg1++) {
         const char *fname = argv[arg1];
         const ErrorCode ec2 = getAttributes (fname, &attr);
-        AttrStyle style = (tty ? AS_HUMAN_COLOR : AS_HUMAN);
+        AttrStyle style = (colorize ? AS_HUMAN_COLOR : AS_HUMAN);
 
         if (json) {
             style = (argc == arg1 + 1 ? AS_JSON_LAST : AS_JSON_NOTLAST);
