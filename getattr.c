@@ -1,3 +1,7 @@
+#include "whence.h"
+
+#ifndef _WIN32
+
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -9,8 +13,6 @@
 #include <sys/xattr.h>
 // #include <attr/xattr.h>
 #endif
-
-#include "whence.h"
 
 static ssize_t call_getxattr (const char *path,
                               const char *name,
@@ -86,3 +88,5 @@ ErrorCode getAttribute (const char *fname,
     *length = ret2;
     return EC_OK;
 }
+
+#endif  /* not _WIN32 */

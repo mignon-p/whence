@@ -39,3 +39,25 @@ void AL_cleanup (ArrayList *al) {
     free (al->strings);
     AL_init (al);
 }
+
+char *AL_join (const ArrayList *al) {
+    size_t len = 1;             /* for NUL terminator */
+    size_t i;
+
+    for (i = 0; i < al->size; i++) {
+        len += strlen (al->strings[i]);
+    }
+
+    char *s = malloc (len);
+    CHECK_NULL (s);
+
+    len = 0;
+    for (i = 0; i < al->size; i++) {
+        const size_t len1 = strlen (al->strings[i]);
+        memcpy (s + len, al->strings[i], len1);
+        len += len1;
+    }
+
+    s[len] = 0;                 /* NUL terminate */
+    return s;
+}

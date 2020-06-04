@@ -33,6 +33,7 @@ typedef struct ArrayList {
 
 void AL_init (ArrayList *al);
 void AL_add (ArrayList *al, const char *str);
+char *AL_join (const ArrayList *al);
 void AL_clear (ArrayList *al);
 void AL_cleanup (ArrayList *al);
 
