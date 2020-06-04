@@ -3,13 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MIN_CAP 5
+
 void AL_init (ArrayList *al) {
     memset (al, 0, sizeof (*al));
 }
 
-#define MIN_CAP 5
-
 void AL_add (ArrayList *al, const char *str) {
+    char *newStr = strdup (str);
+    CHECK_NULL (newStr);
+    AL_add_nocopy (al, newStr);
+}
+
+void AL_add_nocopy (ArrayList *al, char *str) {
     if (al->size <= al->capacity) {
         size_t newCap = al->capacity * 2;
         if (newCap < MIN_CAP) {
@@ -19,9 +25,7 @@ void AL_add (ArrayList *al, const char *str) {
         CHECK_NULL (al->strings);
     }
 
-    char *newStr = strdup (str);
-    CHECK_NULL (newStr);
-    al->strings[al->size++] = newStr;
+    al->strings[al->size++] = str;
 }
 
 void AL_clear (ArrayList *al) {

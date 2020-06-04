@@ -33,13 +33,14 @@ typedef struct ArrayList {
 
 void AL_init (ArrayList *al);
 void AL_add (ArrayList *al, const char *str);
+void AL_add_nocopy (ArrayList *al, char *str);
 char *AL_join (const ArrayList *al);
 void AL_clear (ArrayList *al);
 void AL_cleanup (ArrayList *al);
 
 ErrorCode props2list (const void *data, size_t length, ArrayList *dest);
 
-void split (const char *str, const char *sep, ArrayList *dest);
+void split (const char *str, char sep, ArrayList *dest);
 
 typedef struct Attributes {
     char *url;

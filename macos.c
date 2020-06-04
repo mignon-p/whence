@@ -11,7 +11,7 @@ static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
     ArrayList al;
 
     AL_init (&al);
-    split (s, ";", &al);
+    split (s, ';', &al);
 
     if (al.size < 3) {
         if (dest->error == NULL) {
