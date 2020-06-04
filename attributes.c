@@ -26,13 +26,13 @@ static void human_print_field (const char *field,
 }
 
 static void human_print_fname_color (const char *fname) {
-    printf ("\e[96m%s\e[0m:\n", fname);
+    printf ("\e[95m%s\e[0m:\n", fname);
 }
 
 static void human_print_field_color (const char *field,
                                      const char *value,
                                      bool *firstField) {
-    printf ("  \e[95m%-11s\e[0m \e[92m%s\e[0m\n", field, value);
+    printf ("  \e[92m%-11s\e[0m %s\n", field, value);
 }
 
 static void human_print_end (bool lastFile) {
