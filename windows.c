@@ -6,6 +6,7 @@
 #include <io.h>
 #include <string.h>
 #include <errno.h>
+#include <stdlib.h>
 
 ErrorCode getAttribute (const char *fname,
                         const char *attr,
@@ -26,7 +27,7 @@ ErrorCode getAttribute (const char *fname,
 
     FILE *f = fopen (streamName, "r");
     if (!f) {
-        const errnum = errno;
+        const int errnum = errno;
         *result = strdup (strerror (errnum));
         CHECK_NULL (*result);
         *length = strlen (*result);
@@ -58,7 +59,7 @@ ErrorCode getAttribute (const char *fname,
     }
 
     if (ferror (f)) {
-        *result = strdup (sterror (errno));
+        *result = strdup (strerror (errno));
         CHECK_NULL (*result);
         *length = strlen (*result);
         ec = EC_OTHER;
@@ -89,7 +90,7 @@ int main (int argc, char **argv) {
 
         const ErrorCode ec =
             getAttribute (fname, "Zone.Identifier", &result, &length);
-        if (ec = EC_OK) {
+        if (ec == EC_OK) {
             printf ("%s:\n%s\n", fname, result);
         } else {
             printf ("%s: %s\n", fname, result);

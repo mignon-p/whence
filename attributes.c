@@ -148,22 +148,22 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
         return;
     }
 
-    char buf[40];
     const char *date = NULL;
+
+    /* only MacOS records the date that the file was downloaded */
+#ifdef __APPLE__
     const time_t t = attrs->date;
+    char buf[40];
     if (t != 0) {
         if (!is_json (style)) {
-#ifdef __linux__
-            strftime (buf, sizeof (buf), "%c", localtime (&t));
-#else
             strftime (buf, sizeof (buf), "%+", localtime (&t));
-#endif
         } else {
             strftime (buf, sizeof (buf), "%Y-%m-%dT%H:%M:%SZ", gmtime (&t));
         }
 
         date = buf;
     }
+#endif
 
     p->print_fname (fname);
     PR("URL", attrs->url);
