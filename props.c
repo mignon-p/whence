@@ -1,5 +1,7 @@
 #include "whence.h"
 
+#ifdef __APPLE__
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -119,3 +121,5 @@ ErrorCode props2list (const void *data, size_t length, ArrayList *dest) {
     CFRelease (plist);
     return ec;
 }
+
+#endif  /* __APPLE__ */

@@ -6,7 +6,8 @@
 #include <sys/xattr.h>
 #else
 #include <sys/types.h>
-#include <attr/xattr.h>
+#include <sys/xattr.h>
+// #include <attr/xattr.h>
 #endif
 
 #include "whence.h"
@@ -24,7 +25,11 @@ static ssize_t call_getxattr (const char *path,
 
 static ErrorCode errnum2ec (int errnum) {
     switch (errnum) {
+#ifdef ENOATTR
     case ENOATTR:
+#elif defined (ENODATA)
+    case ENODATA:
+#endif
     case ENOTSUP:
         return EC_NOATTR;
     case EISDIR:

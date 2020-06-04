@@ -2,6 +2,8 @@
 
 #ifdef __linux__
 
+#include <stdlib.h>
+
 static ErrorCode handle_attribute (const char *fname,
                                    const char *aname,
                                    char **dest,

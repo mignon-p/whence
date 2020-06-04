@@ -1,3 +1,7 @@
+#include "whence.h"
+
+#ifdef __APPLE__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -6,8 +10,6 @@
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFNumber.h>
 #include <CoreFoundation/CFNumberFormatter.h>
-
-#include "whence.h"
 
 void printPlist (CFPropertyListRef plist, uintptr_t indent);
 
@@ -149,3 +151,4 @@ void checkProps (const void *data, size_t length, const char* filename) {
     CFRelease (plist);
 }
 
+#endif  /* __APPLE__ */
