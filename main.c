@@ -1,7 +1,5 @@
 #include "whence.h"
 
-#ifndef _WIN32                  /* temporary hack */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -108,5 +106,3 @@ int main (int argc, char **orig_argv) {
     free (argv);
     return ec;
 }
-
-#endif  /* not _WIN32 */

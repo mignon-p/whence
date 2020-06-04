@@ -80,26 +80,63 @@ ErrorCode getAttribute (const char *fname,
     return ec;
 }
 
-int main (int argc, char **argv) {
-    int i;
+static int handleKey (const char *key, const char *value, Attributes *dest) {
+    char **field = NULL;
 
-    for (i = 1; i < argc; i++) {
-        const char *fname = argv[i];
-        char *result = NULL;
-        size_t length = 0;
-
-        const ErrorCode ec =
-            getAttribute (fname, "Zone.Identifier", &result, &length);
-        if (ec == EC_OK) {
-            printf ("%s:\n%s\n", fname, result);
-        } else {
-            printf ("%s: %s\n", fname, result);
-        }
-
-        free (result);
+    if (0 == strcmp (key, "ReferrerUrl")) {
+        field = &dest->referrer;
+    } else if (0 == strcmp (key, "HostUrl")) {
+        field = &dest->url;
     }
 
-    return 0;
+    if (field) {
+        *field = strdup (value);
+        CHECK_NULL (*field);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+static int parseZoneIdentifier (const char *zi, Attributes *dest) {
+    int count = 0;
+    ArrayList lines;
+
+    AL_init (&lines);
+    split (zi, '\n', &lines);
+
+    size_t i;
+    for (i = 0; i < lines.size; i++) {
+        char *line = lines.strings[i];
+        char *eq = strchr (line, '=');
+        if (eq) {
+            *eq = 0;
+            count += handleKey (line, eq + 1, dest);
+            *eq = '=';
+        }
+    }
+
+    AL_cleanup (&lines);
+    return count;
+}
+
+ErrorCode getAttributes (const char *fname, Attributes *dest) {
+    char *result = NULL;
+    size_t length = 0;
+
+    const ErrorCode ec =
+        getAttribute (fname, "Zone.Identifier", &result, &length);
+    if (ec > EC_NOATTR && dest->error == NULL) {
+        dest->error = result;
+        return ec;
+    } else if (ec != EC_OK) {
+        free (result);
+        return ec;
+    }
+
+    const int numAttrs = parseZoneIdentifier (result, dest);
+    free (result);
+    return (numAttrs == 0 ? EC_NOATTR : EC_OK);
 }
 
 #endif  /* _WIN32 */
