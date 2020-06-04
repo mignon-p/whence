@@ -44,11 +44,6 @@ int main (int argc, char **orig_argv) {
     bool json = false;
     int arg1 = 1;
 
-    int i;
-    for (i = 0; i < argc; i++) {
-        printf ("argv[%d] = \"%s\"\n", i, argv[i]);
-    }
-
     if (arg1 < argc && is_option (argv[arg1], "-j", "--json")) {
         json = true;
         arg1++;
@@ -77,16 +72,7 @@ int main (int argc, char **orig_argv) {
     }
 
     for ( ; arg1 < argc; arg1++) {
-        printf ("argv[%d] = \"%s\"\n", arg1, argv[arg1]);
-
         const char *fname = argv[arg1];
-
-        if (fname == NULL) {
-            fprintf (stderr, "fname is NULL in main()\n");
-            free (argv);
-            return 10;
-        }
-
         const ErrorCode ec2 = getAttributes (fname, &attr);
         AttrStyle style = AS_HUMAN;
 

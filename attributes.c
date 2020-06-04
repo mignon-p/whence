@@ -106,11 +106,6 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     const bool lastFile = (style == AS_JSON_LAST);
     bool firstField = true;
 
-    if (fname == NULL) {
-        fprintf (stderr, "fname is NULL!\n");
-        exit (10);
-    }
-
     if (attrs->error != NULL && style == AS_HUMAN) {
         fprintf (stderr, "%s: %s\n", fname, attrs->error);
         return;
