@@ -20,10 +20,6 @@ ErrorCode getAttribute (const char *fname,
                         char **result,
                         size_t *length);
 
-ErrorCode printProps (const void *data, size_t length);
-
-void checkProps (const void *data, size_t length, const char* filename);
-
 #define CHECK_NULL(x) \
     do { if ((x) == NULL) oom (__FILE__, __LINE__); } while (0)
 
