@@ -25,6 +25,16 @@ static void human_print_field (const char *field,
     printf ("  %-11s %s\n", field, value);
 }
 
+static void human_print_fname_color (const char *fname) {
+    printf ("\e[96m%s\e[0m:\n", fname);
+}
+
+static void human_print_field_color (const char *field,
+                                     const char *value,
+                                     bool *firstField) {
+    printf ("  \e[95m%-11s\e[0m \e[92m%s\e[0m\n", field, value);
+}
+
 static void human_print_end (bool lastFile) {
     /* do nothing */
 }
@@ -88,11 +98,38 @@ static const Printer printer_human = {
     human_print_end
 };
 
+static const Printer printer_human_color = {
+    human_print_fname_color,
+    human_print_field_color,
+    human_print_end
+};
+
 static const Printer printer_json = {
     json_print_fname,
     json_print_field,
     json_print_end
 };
+
+static const Printer *get_printer (AttrStyle style) {
+    switch (style) {
+    case AS_HUMAN:
+        return &printer_human;
+    case AS_HUMAN_COLOR:
+        return &printer_human_color;
+    default:
+        return &printer_json;
+    }
+}
+
+static bool is_json (AttrStyle style) {
+    switch (style) {
+    case AS_JSON_NOTLAST:
+    case AS_JSON_LAST:
+        return true;
+    default:
+        return false;
+    }
+}
 
 void Attr_init (Attributes *attrs) {
     memset (attrs, 0, sizeof (*attrs));
@@ -102,11 +139,11 @@ void Attr_init (Attributes *attrs) {
     if (value) p->print_field (field, value, &firstField)
 
 void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
-    const Printer *p = (style == AS_HUMAN ? &printer_human : &printer_json);
+    const Printer *p = get_printer (style);
     const bool lastFile = (style == AS_JSON_LAST);
     bool firstField = true;
 
-    if (attrs->error != NULL && style == AS_HUMAN) {
+    if (attrs->error != NULL && !is_json (style)) {
         fprintf (stderr, "%s: %s\n", fname, attrs->error);
         return;
     }
@@ -114,8 +151,8 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     char buf[40];
     const char *date = NULL;
     const time_t t = attrs->date;
-    if (date != 0) {
-        if (style == AS_HUMAN) {
+    if (t != 0) {
+        if (!is_json (style)) {
             strftime (buf, sizeof (buf), "%c", localtime (&t));
         } else {
             strftime (buf, sizeof (buf), "%Y-%m-%dT%H:%M:%SZ", gmtime (&t));

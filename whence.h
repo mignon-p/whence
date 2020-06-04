@@ -54,6 +54,7 @@ typedef struct Attributes {
 
 typedef enum AttrStyle {
     AS_HUMAN,
+    AS_HUMAN_COLOR,
     AS_JSON_NOTLAST,
     AS_JSON_LAST
 } AttrStyle;

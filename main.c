@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <unistd.h>
 
 static void print_usage (void) {
     fprintf (stderr, "Usage: " CMD_NAME " [OPTIONS] FILE ...\n\n");
@@ -67,6 +68,8 @@ int main (int argc, char **orig_argv) {
     bool first = true;
     ErrorCode ec = EC_OK;
 
+    const bool tty = isatty (STDOUT_FILENO);
+
     if (json) {
         printf ("{\n");
     }
@@ -74,7 +77,7 @@ int main (int argc, char **orig_argv) {
     for ( ; arg1 < argc; arg1++) {
         const char *fname = argv[arg1];
         const ErrorCode ec2 = getAttributes (fname, &attr);
-        AttrStyle style = AS_HUMAN;
+        AttrStyle style = (tty ? AS_HUMAN_COLOR : AS_HUMAN);
 
         if (json) {
             style = (argc == arg1 + 1 ? AS_JSON_LAST : AS_JSON_NOTLAST);
