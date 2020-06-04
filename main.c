@@ -32,9 +32,22 @@ static bool is_option (const char *arg, const char *opt1, const char *opt2) {
     }
 }
 
-int main (int argc, char **argv) {
+int main (int argc, char **orig_argv) {
+    /* Weird things happen if I don't make a copy of argv.  This must
+     * mean there is a bug somewhere, but I can't find it.
+     */
+    const size_t argv_size = sizeof (char *) * argc;
+    char **argv = malloc (argv_size);
+    CHECK_NULL (argv);
+    memcpy (argv, orig_argv, argv_size);
+
     bool json = false;
     int arg1 = 1;
+
+    int i;
+    for (i = 0; i < argc; i++) {
+        printf ("argv[%d] = \"%s\"\n", i, argv[i]);
+    }
 
     if (arg1 < argc && is_option (argv[arg1], "-j", "--json")) {
         json = true;
@@ -43,11 +56,13 @@ int main (int argc, char **argv) {
 
     if (arg1 < argc && is_option (argv[arg1], "-h", "--help")) {
         print_usage ();
+        free (argv);
         return EC_OK;
     }
 
     if (arg1 < argc && is_option (argv[arg1], "-v", "--version")) {
         print_version ();
+        free (argv);
         return EC_OK;
     }
 
@@ -62,10 +77,13 @@ int main (int argc, char **argv) {
     }
 
     for ( ; arg1 < argc; arg1++) {
+        printf ("argv[%d] = \"%s\"\n", arg1, argv[arg1]);
+
         const char *fname = argv[arg1];
 
         if (fname == NULL) {
             fprintf (stderr, "fname is NULL in main()\n");
+            free (argv);
             return 10;
         }
 
@@ -92,5 +110,6 @@ int main (int argc, char **argv) {
         printf ("}\n");
     }
 
+    free (argv);
     return ec;
 }
