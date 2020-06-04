@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include <locale.h>
 
 static void print_usage (void) {
     fprintf (stderr, "Usage: " CMD_NAME " [OPTIONS] FILE ...\n\n");
@@ -69,6 +70,9 @@ int main (int argc, char **orig_argv) {
     ErrorCode ec = EC_OK;
 
     const bool tty = isatty (STDOUT_FILENO);
+    if (NULL == setlocale (LC_TIME, "")) {
+        perror ("setlocale");
+    }
 
     if (json) {
         printf ("{\n");

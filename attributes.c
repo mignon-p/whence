@@ -153,7 +153,7 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     const time_t t = attrs->date;
     if (t != 0) {
         if (!is_json (style)) {
-            strftime (buf, sizeof (buf), "%c", localtime (&t));
+            strftime (buf, sizeof (buf), "%+", localtime (&t));
         } else {
             strftime (buf, sizeof (buf), "%Y-%m-%dT%H:%M:%SZ", gmtime (&t));
         }
