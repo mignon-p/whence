@@ -5,6 +5,10 @@
 #include <Windows.h>
 #include <io.h>
 
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 4
+#endif
+
 static DWORD oldMode;
 static HANDLE consoleHandle;
 
@@ -13,7 +17,7 @@ static void restore_mode (void) {
 }
 
 bool enableColorEscapes (int fd) {
-    const HANDLE h = _get_osfhandle (fd);
+  const HANDLE h = (HANDLE) _get_osfhandle (fd);
     if (h == INVALID_HANDLE_VALUE) {
         return false;
     }
