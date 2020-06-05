@@ -7,6 +7,43 @@
 #include <stdlib.h>
 #include <errno.h>
 
+static int parse_hex (char c1, char c2) {
+    char *endptr = NULL;
+    char buf[3];
+    buf[0] = c1;
+    buf[1] = c2;
+    buf[2] = 0;
+
+    const unsigned long n = strtoul (buf, &endptr, 16);
+    if (endptr == buf + 2) {
+        return (int) n;
+    } else {
+        return -1;
+    }
+}
+
+static char *unescape (const char *s) {
+    const size_t len = strlen (s);
+    char *u = malloc (len + 1);
+    CHECK_NULL (u);
+
+    size_t i, j = 0;
+    for (i = 0; i < len; i++) {
+        const char c = s[i];
+        int x;
+        if (c == '\\' && s[i+1] == 'x' && s[i+2] != 0 &&
+            (x = parse_hex (s[i+2], s[i+3])) != -1) {
+            u[j++] = (char) x;
+            i += 3;
+        } else {
+            u[j++] = c;
+        }
+    }
+
+    u[j] = 0;
+    return u;
+}
+
 static ErrorCode parse_quarantine (Attributes *dest,
                                    const char *s,
                                    DatabaseConnection *conn) {
@@ -62,8 +99,7 @@ static ErrorCode parse_quarantine (Attributes *dest,
     }
 
     if (dest->application == NULL) {
-        dest->application = strdup (application);
-        CHECK_NULL (dest->application);
+        dest->application = unescape (application);
     }
 
     ErrorCode ret = EC_OK;
