@@ -66,7 +66,7 @@ static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
 
     ErrorCode ret = EC_OK;
     if (uuid && *uuid) {
-        // ret = lookup_uuid (dest, uuid);
+        ret = lookup_uuid (dest, uuid);
     }
 
     AL_cleanup (&al);

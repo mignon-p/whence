@@ -75,4 +75,7 @@ ErrorCode getAttributes (const char *fname, Attributes *dest);
 /* color.c */
 bool enableColorEscapes (int fd);
 
+/* database.c */
+ErrorCode lookup_uuid (Attributes *dest, const char *uuid);
+
 #endif  /* WHENCE_H */
