@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define DB_FILENAME \
     "/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2"
@@ -100,36 +101,62 @@ static ErrorCode run_query (Attributes *dest, const char *uuid, sqlite3 *sq) {
     return ec;
 }
 
-ErrorCode lookup_uuid (Attributes *dest, const char *uuid) {
+static sqlite3 *get_database (DatabaseConnection *conn) {
+    if (conn->db) {
+        return (sqlite3 *) conn->db;
+    }
+
+    if (conn->triedOpening) {
+        return NULL;            /* so we don't try again if we already failed */
+    }
+
+    conn->triedOpening = true;
+
     char *dbname = get_dbname ();
     if (dbname == NULL) {
-        int errnum = errno;
-        if (dest->error == NULL && errnum != 0) {
-            dest->error = strdup (strerror (errnum));
-            CHECK_NULL (dest->error);
-            return EC_OTHER;
-        }
+        perror (CMD_NAME);
+        return NULL;
     }
 
-    ErrorCode ec = EC_OK;
     sqlite3 *sq = NULL;
     const int err = sqlite3_open_v2 (dbname, &sq, SQLITE_OPEN_READONLY, NULL);
-    CHECK_NULL (sq);
+    CHECK_NULL (sq);            /* should only be NULL if out of memory */
     if (err != SQLITE_OK) {
-        if (dest->error == NULL) {
-            dest->error = strdup (sqlite3_errmsg (sq));
-            CHECK_NULL (dest->error);
-        }
-        ec = EC_OTHER;
-        goto done;
+        fprintf (stderr, "%s: %s\n", dbname, sqlite3_errmsg (sq));
+        sqlite3_close (sq);
+        free (dbname);
+        return NULL;
     }
 
-    ec = run_query (dest, uuid, sq);
-
- done:
+    conn->db = sq;
     free (dbname);
-    sqlite3_close (sq);
-    return ec;
+    return sq;
+}
+
+ErrorCode lookup_uuid (Attributes *dest,
+                       const char *uuid,
+                       DatabaseConnection *conn) {
+    sqlite3 *sq = get_database (conn);
+    if (!sq) {
+        return EC_OK;
+    }
+
+    return run_query (dest, uuid, sq);
+}
+
+void closeDatabase (DatabaseConnection *conn) {
+    if (conn->db) {
+        sqlite3 *sq = (sqlite3 *) conn->db;
+        sqlite3_close (sq);
+        conn->db = NULL;
+        conn->triedOpening = false;
+    }
+}
+
+#else  /* __APPLE__ */
+
+void closeDatabase (DatabaseConnection *conn) {
+    // do nothing
 }
 
 #endif  /* __APPLE__ */

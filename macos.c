@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <errno.h>
 
-static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
+static ErrorCode parse_quarantine (Attributes *dest,
+                                   const char *s,
+                                   DatabaseConnection *conn) {
     ArrayList al;
 
     AL_init (&al);
@@ -66,7 +68,7 @@ static ErrorCode parse_quarantine (Attributes *dest, const char *s) {
 
     ErrorCode ret = EC_OK;
     if (uuid && *uuid) {
-        ret = lookup_uuid (dest, uuid);
+        ret = lookup_uuid (dest, uuid, conn);
     }
 
     AL_cleanup (&al);
@@ -119,7 +121,9 @@ static ErrorCode parse_wherefroms (Attributes *dest,
     return EC_OK;
 }
 
-ErrorCode getAttributes (const char *fname, Attributes *dest) {
+ErrorCode getAttributes (const char *fname,
+                         Attributes *dest,
+                         DatabaseConnection *conn) {
     Attr_init (dest);
 
     char *result = NULL;
@@ -128,7 +132,7 @@ ErrorCode getAttributes (const char *fname, Attributes *dest) {
     ErrorCode ec1 = getAttribute (fname, "com.apple.quarantine",
                                   &result, &length);
     if (ec1 == EC_OK) {
-        ec1 = parse_quarantine (dest, result);
+        ec1 = parse_quarantine (dest, result, conn);
     } else if (ec1 != EC_NOATTR) {
         dest->error = result;   /* transfer ownership */
         result = NULL;

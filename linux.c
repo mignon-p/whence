@@ -23,7 +23,9 @@ static ErrorCode handle_attribute (const char *fname,
     return ec;
 }
 
-ErrorCode getAttributes (const char *fname, Attributes *dest) {
+ErrorCode getAttributes (const char *fname,
+                         Attributes *dest,
+                         DatabaseConnection *conn) {
     ErrorCode ec1 = handle_attribute (fname,
                                       "user.xdg.origin.url",
                                       &dest->url,

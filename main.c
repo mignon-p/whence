@@ -63,6 +63,9 @@ int main (int argc, char **orig_argv) {
         return EC_OK;
     }
 
+    DatabaseConnection db;
+    memset (&db, 0, sizeof (db));
+
     Attributes attr;
     Attr_init (&attr);
 
@@ -82,7 +85,7 @@ int main (int argc, char **orig_argv) {
 
     for ( ; arg1 < argc; arg1++) {
         const char *fname = argv[arg1];
-        const ErrorCode ec2 = getAttributes (fname, &attr);
+        const ErrorCode ec2 = getAttributes (fname, &attr, &db);
         AttrStyle style = (colorize ? AS_HUMAN_COLOR : AS_HUMAN);
 
         if (json) {
@@ -104,6 +107,8 @@ int main (int argc, char **orig_argv) {
     if (json) {
         printf ("}\n");
     }
+
+    closeDatabase (&db);
 
     free (argv);
     return ec;

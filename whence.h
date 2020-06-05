@@ -37,6 +37,11 @@ typedef enum AttrStyle {
     AS_JSON_LAST
 } AttrStyle;
 
+typedef struct DatabaseConnection {
+    void *db;
+    bool triedOpening;
+} DatabaseConnection;
+
 #define CHECK_NULL(x) \
     do { if ((x) == NULL) oom (__FILE__, __LINE__); } while (0)
 
@@ -70,12 +75,17 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style);
 void Attr_cleanup (Attributes *attrs);
 
 /* linux.c, macos.c, or windows.c */
-ErrorCode getAttributes (const char *fname, Attributes *dest);
+ErrorCode getAttributes (const char *fname,
+                         Attributes *dest,
+                         DatabaseConnection *conn);
 
 /* color.c */
 bool enableColorEscapes (int fd);
 
 /* database.c */
-ErrorCode lookup_uuid (Attributes *dest, const char *uuid);
+ErrorCode lookup_uuid (Attributes *dest,
+                       const char *uuid,
+                       DatabaseConnection *conn);
+void closeDatabase (DatabaseConnection *conn);
 
 #endif  /* WHENCE_H */

@@ -47,7 +47,7 @@ ErrorCode getAttribute (const char *fname,
     }
 
     for ( ; ; ) {
-        char buf[32];
+        char buf[81];
 
         const size_t bites = fread (buf, 1, sizeof (buf) - 1, f);
         if (bites == 0 || bites >= sizeof (buf)) {
@@ -120,7 +120,9 @@ static int parseZoneIdentifier (const char *zi, Attributes *dest) {
     return count;
 }
 
-ErrorCode getAttributes (const char *fname, Attributes *dest) {
+ErrorCode getAttributes (const char *fname,
+                         Attributes *dest,
+                         DatabaseConnection *conn) {
     char *result = NULL;
     size_t length = 0;
 
