@@ -8,15 +8,17 @@
 #include <time.h>
 
 typedef struct Printer {
-    void (*print_fname) (const char *fname);
+    void (*print_fname) (const char *fname, bool empty);
     void (*print_field) (const char *field,
                          const char *value,
                          bool *firstField);
     void (*print_end) (bool lastFile);
 } Printer;
 
-static void human_print_fname (const char *fname) {
-    printf ("%s:\n", fname);
+static void human_print_fname (const char *fname, bool empty) {
+    if (!empty) {
+        printf ("%s:\n", fname);
+    }
 }
 
 static void human_print_field (const char *field,
@@ -25,8 +27,10 @@ static void human_print_field (const char *field,
     printf ("  %-11s %s\n", field, value);
 }
 
-static void human_print_fname_color (const char *fname) {
-    printf ("\e[95m%s\e[0m:\n", fname);
+static void human_print_fname_color (const char *fname, bool empty) {
+    if (!empty) {
+        printf ("\e[95m%s\e[0m:\n", fname);
+    }
 }
 
 static void human_print_field_color (const char *field,
@@ -62,7 +66,7 @@ static void print_string (const char *s, bool forceLC) {
     putchar ('"');
 }
 
-static void json_print_fname (const char *fname) {
+static void json_print_fname (const char *fname, bool empty) {
     printf ("  ");
     print_string (fname, false);
     printf (": {");
@@ -131,6 +135,19 @@ static bool is_json (AttrStyle style) {
     }
 }
 
+static bool isEmpty (const Attributes *attrs) {
+    const unsigned char *p = (unsigned char *) attrs;
+    size_t i;
+
+    for (i = 0; i < sizeof (*attrs); i++) {
+        if (p[i] != 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void Attr_init (Attributes *attrs) {
     memset (attrs, 0, sizeof (*attrs));
 }
@@ -165,7 +182,7 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     }
 #endif
 
-    p->print_fname (fname);
+    p->print_fname (fname, isEmpty (attrs));
     PR("URL", attrs->url);
     PR("Referrer", attrs->referrer);
     PR("Application", attrs->application);
