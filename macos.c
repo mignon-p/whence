@@ -103,7 +103,8 @@ static ErrorCode parse_quarantine (Attributes *dest,
     }
 
     ErrorCode ret = EC_OK;
-    if (uuid && *uuid) {
+    const bool have_urls = (dest->url != NULL && dest->referrer != NULL);
+    if (uuid && *uuid && !have_urls) {
         ret = lookup_uuid (dest, uuid, conn);
     }
 
@@ -165,10 +166,11 @@ ErrorCode getAttributes (const char *fname,
     char *result = NULL;
     size_t length = 0;
 
-    ErrorCode ec1 = getAttribute (fname, "com.apple.quarantine",
-                                  &result, &length);
+    ErrorCode ec1 =
+        getAttribute (fname, "com.apple.metadata:kMDItemWhereFroms",
+                      &result, &length);
     if (ec1 == EC_OK) {
-        ec1 = parse_quarantine (dest, result, conn);
+        ec1 = parse_wherefroms (dest, result, length);
     } else if (ec1 != EC_NOATTR) {
         dest->error = result;   /* transfer ownership */
         result = NULL;
@@ -178,11 +180,10 @@ ErrorCode getAttributes (const char *fname,
     result = NULL;
 
     if (ec1 != EC_NOFILE) {
-        ErrorCode ec2 =
-            getAttribute (fname, "com.apple.metadata:kMDItemWhereFroms",
-                          &result, &length);
+        ErrorCode ec2 = getAttribute (fname, "com.apple.quarantine",
+                                      &result, &length);
         if (ec2 == EC_OK) {
-            ec2 = parse_wherefroms (dest, result, length);
+            ec2 = parse_quarantine (dest, result, conn);
         } else if (ec2 != EC_NOATTR && dest->error == NULL) {
             dest->error = result;   /* transfer ownership */
             result = NULL;
