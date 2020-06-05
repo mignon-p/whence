@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <time.h>
 
+#define TRUNCATION_LIMIT 1600
+
 typedef struct Printer {
     void (*print_fname) (const char *fname, bool empty);
     void (*print_field) (const char *field,
@@ -14,6 +16,19 @@ typedef struct Printer {
                          bool *firstField);
     void (*print_end) (bool lastFile);
 } Printer;
+
+static void print_limited (const char *s, bool color) {
+    const size_t len = strlen (s);
+    if (len <= TRUNCATION_LIMIT) {
+        printf ("%s\n", s);
+    } else {
+        const int limit = TRUNCATION_LIMIT;
+        const char *color_on = (color ? "\e[91m": "");
+        const char *color_off = (color ? "\e[0m": "");
+        printf ("%.*s%s... (%lu bytes)%s\n",
+                limit, s, color_on, (unsigned long) len, color_off);
+    }
+}
 
 static void human_print_fname (const char *fname, bool empty) {
     if (!empty) {
@@ -24,7 +39,8 @@ static void human_print_fname (const char *fname, bool empty) {
 static void human_print_field (const char *field,
                                const char *value,
                                bool *firstField) {
-    printf ("  %-11s %s\n", field, value);
+    printf ("  %-11s ", field);
+    print_limited (value, false);
 }
 
 static void human_print_fname_color (const char *fname, bool empty) {
@@ -36,7 +52,8 @@ static void human_print_fname_color (const char *fname, bool empty) {
 static void human_print_field_color (const char *field,
                                      const char *value,
                                      bool *firstField) {
-    printf ("  \e[92m%-11s\e[0m %s\n", field, value);
+    printf ("  \e[92m%-11s\e[0m ", field);
+    print_limited (value, true);
 }
 
 static void human_print_end (bool lastFile) {
