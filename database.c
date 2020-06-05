@@ -2,6 +2,10 @@
 
 #ifdef __APPLE__
 
+/* For more information:
+ * https://eclecticlight.co/2017/12/11/xattr-com-apple-quarantine-the-quarantine-flag/
+ */
+
 #include <sqlite3.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -44,6 +48,10 @@ static char *get_dbname (void) {
 
 static void handleKey (const char *key, const char *value, Attributes *dest) {
     char **field = NULL;
+
+    if (key == NULL || value == NULL) {
+        return;
+    }
 
     if (0 == strcmp (key, "LSQuarantineOriginURLString")) {
         field = &dest->referrer;
