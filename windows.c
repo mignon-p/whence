@@ -80,13 +80,19 @@ ErrorCode getAttribute (const char *fname,
     return ec;
 }
 
-static int handleKey (const char *key, const char *value, Attributes *dest) {
+static int handleKey (const char *key,
+                      const char *value,
+                      Attributes *dest,
+                      ZoneCache *zc) {
     char **field = NULL;
 
     if (0 == strcmp (key, "ReferrerUrl")) {
         field = &dest->referrer;
     } else if (0 == strcmp (key, "HostUrl")) {
         field = &dest->url;
+    } else if (0 == strcmp (key, "ZoneId")) {
+        field = &dest->zone;
+        value = getZoneName (value, zc);
     }
 
     if (field) {
@@ -98,7 +104,9 @@ static int handleKey (const char *key, const char *value, Attributes *dest) {
     }
 }
 
-static int parseZoneIdentifier (const char *zi, Attributes *dest) {
+static int parseZoneIdentifier (const char *zi,
+                                Attributes *dest,
+                                ZoneCache *zc) {
     int count = 0;
     ArrayList lines;
 
@@ -111,7 +119,7 @@ static int parseZoneIdentifier (const char *zi, Attributes *dest) {
         char *eq = strchr (line, '=');
         if (eq) {
             *eq = 0;
-            count += handleKey (line, eq + 1, dest);
+            count += handleKey (line, eq + 1, dest, zc);
             *eq = '=';
         }
     }
@@ -122,7 +130,7 @@ static int parseZoneIdentifier (const char *zi, Attributes *dest) {
 
 ErrorCode getAttributes (const char *fname,
                          Attributes *dest,
-                         DatabaseConnection *conn) {
+                         ZoneCache *zc) {
     char *result = NULL;
     size_t length = 0;
 
@@ -136,7 +144,7 @@ ErrorCode getAttributes (const char *fname,
         return ec;
     }
 
-    const int numAttrs = parseZoneIdentifier (result, dest);
+    const int numAttrs = parseZoneIdentifier (result, dest, zc);
     free (result);
     return (numAttrs == 0 ? EC_NOATTR : EC_OK);
 }

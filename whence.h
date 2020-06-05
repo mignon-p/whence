@@ -27,6 +27,7 @@ typedef struct Attributes {
     char *referrer;
     char *application;
     time_t date;
+    char *zone;
     char *error;
 } Attributes;
 
@@ -42,7 +43,20 @@ typedef struct DatabaseConnection {
     bool triedOpening;
 } DatabaseConnection;
 
-#define CHECK_NULL(x) \
+typedef struct ZoneCache {
+    ArrayList keys;
+    ArrayList values;
+} ZoneCache;
+
+#ifdef __APPLE__
+typedef DatabaseConnection Cache;
+#elif define (_WIN32)
+typedef ZoneCache Cache;
+#else
+typedef int Cache;              /* dummy */
+#endif
+
+#define CHECK_NULL(x)                                           \
     do { if ((x) == NULL) oom (__FILE__, __LINE__); } while (0)
 
 /* getattr.c */
@@ -77,7 +91,11 @@ void Attr_cleanup (Attributes *attrs);
 /* linux.c, macos.c, or windows.c */
 ErrorCode getAttributes (const char *fname,
                          Attributes *dest,
-                         DatabaseConnection *conn);
+                         Cache *cache);
+
+/* linux.c, database.c, or registry.c */
+void Cache_init (Cache *cache);
+void Cache_cleanup (Cache *cache);
 
 /* color.c */
 bool enableColorEscapes (int fd);
@@ -86,6 +104,8 @@ bool enableColorEscapes (int fd);
 ErrorCode lookup_uuid (Attributes *dest,
                        const char *uuid,
                        DatabaseConnection *conn);
-void closeDatabase (DatabaseConnection *conn);
+
+/* registry.c */
+const char *getZoneName (const char *zoneNumber, ZoneCache *zc);
 
 #endif  /* WHENCE_H */

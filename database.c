@@ -65,7 +65,6 @@ static void handleKey (const char *key, const char *value, Attributes *dest) {
     }
 }
 
-
 static int callback (void *v, int nCols, char **values, char **names) {
     DBCtx *ctx = (DBCtx *) v;
 
@@ -152,19 +151,17 @@ ErrorCode lookup_uuid (Attributes *dest,
     return run_query (dest, uuid, sq);
 }
 
-void closeDatabase (DatabaseConnection *conn) {
+void Cache_init (DatabaseConnection *conn) {
+    memset (conn, 0, sizeof (*conn));
+}
+
+void Cache_cleanup (DatabaseConnection *conn) {
     if (conn->db) {
         sqlite3 *sq = (sqlite3 *) conn->db;
         sqlite3_close (sq);
         conn->db = NULL;
         conn->triedOpening = false;
     }
-}
-
-#else  /* __APPLE__ */
-
-void closeDatabase (DatabaseConnection *conn) {
-    // do nothing
 }
 
 #endif  /* __APPLE__ */

@@ -25,7 +25,7 @@ static ErrorCode handle_attribute (const char *fname,
 
 ErrorCode getAttributes (const char *fname,
                          Attributes *dest,
-                         DatabaseConnection *conn) {
+                         Cache *cache) {
     ErrorCode ec1 = handle_attribute (fname,
                                       "user.xdg.origin.url",
                                       &dest->url,
@@ -39,6 +39,14 @@ ErrorCode getAttributes (const char *fname,
     }
 
     return ec1;
+}
+
+void Cache_init (Cache *cache) {
+    // do nothing
+}
+
+void Cache_cleanup (Cache *cache) {
+    // do nothing
 }
 
 #endif  /* __linux__ */

@@ -170,6 +170,7 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     PR("Referrer", attrs->referrer);
     PR("Application", attrs->application);
     PR("Date", date);
+    PR("Zone", attrs->zone);
     PR("Error", attrs->error);
     p->print_end (lastFile);
 }
@@ -180,5 +181,7 @@ void Attr_cleanup (Attributes *attrs) {
     free (attrs->url);
     free (attrs->referrer);
     free (attrs->application);
+    free (attrs->zone);
     free (attrs->error);
+    Attr_init (attrs);
 }
