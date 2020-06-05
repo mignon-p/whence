@@ -4,13 +4,18 @@
 #include <stdio.h>
 #include <string.h>
 
-void oom (const char *file, long line) {
+static const char *my_basename (const char *file) {
     const char *slash = strrchr (file, '/');
     if (slash) {
-        file = slash + 1;       /* just the basename */
+        return slash + 1;
+    } else {
+        return file;
     }
+}
 
-    fprintf (stderr, CMD_NAME ": out of memory at %s:%ld\n", file, line);
+void oom (const char *file, long line) {
+    fprintf (stderr, CMD_NAME ": out of memory at %s:%ld\n",
+             my_basename (file), line);
     exit (EC_MEM);
 }
 
@@ -24,4 +29,19 @@ ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2) {
     } else {
         return ec1;
     }
+}
+
+char *my_strdup (const char *s, const char *file, long line) {
+    if (s == NULL) {
+        fprintf (stderr, CMD_NAME ": strdup called on NULL at %s:%ld\n",
+                 my_basename (file), line);
+        exit (EC_OTHER);
+    }
+
+    char *ret = strdup (s);
+    if (ret == NULL) {
+        oom (file, line);
+    }
+
+    return ret;
 }

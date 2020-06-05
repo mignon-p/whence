@@ -59,6 +59,8 @@ typedef int Cache;              /* dummy */
 #define CHECK_NULL(x)                                           \
     do { if ((x) == NULL) oom (__FILE__, __LINE__); } while (0)
 
+#define MY_STRDUP(x) my_strdup ((x), __FILE__, __LINE__)
+
 /* getattr.c */
 ErrorCode getAttribute (const char *fname,
                         const char *attr,
@@ -68,6 +70,7 @@ ErrorCode getAttribute (const char *fname,
 /* util.c */
 void oom (const char *file, long line);
 ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2);
+char *my_strdup (const char *s, const char *file, long line);
 
 /* array-list.c */
 void AL_init (ArrayList *al);
