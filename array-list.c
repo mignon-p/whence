@@ -15,7 +15,7 @@ void AL_add (ArrayList *al, const char *str) {
 }
 
 void AL_add_nocopy (ArrayList *al, char *str) {
-    if (al->size <= al->capacity) {
+    if (al->size >= al->capacity) {
         size_t newCap = al->capacity * 2;
         if (newCap < MIN_CAP) {
             newCap = MIN_CAP;
