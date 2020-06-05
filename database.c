@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -42,12 +41,28 @@ static char *get_dbname (void) {
     return dbname;
 }
 
+static void handleKey (const char *key, const char *value, Attributes *dest) {
+    char **field = NULL;
+
+    if (0 == strcmp (key, "LSQuarantineOriginURLString")) {
+        field = &dest->referrer;
+    } else if (0 == strcmp (key, "LSQuarantineDataURLString")) {
+        field = &dest->url;
+    }
+
+    if (field != NULL && *field == NULL) {
+        *field = strdup (value);
+        CHECK_NULL (*field);
+    }
+}
+
+
 static int callback (void *v, int nCols, char **values, char **names) {
     DBCtx *ctx = (DBCtx *) v;
 
     int i;
     for (i = 0; i < nCols; i++) {
-        printf ("%s: %s\n", names[i], values[i]);
+        handleKey (names[i], values[i], ctx->dest);
     }
 
     return 0;
