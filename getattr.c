@@ -81,7 +81,7 @@ ErrorCode getAttribute (const char *fname,
 
     /* NUL terminate (not included in length) to make
      * working with strings easier. */
-    result[ret2] = 0;
+    (*result)[ret2] = 0;
 
     *length = ret2;
     return EC_OK;
