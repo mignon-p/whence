@@ -128,11 +128,11 @@ static ErrorCode parse_wherefroms (Attributes *dest,
         return ec;
     }
 
-    if (al.size != 2) {
+    if (al.size < 1 || al.size > 2) {
         if (dest->error == NULL) {
             char buf[80];
             snprintf (buf, sizeof (buf),
-                      "Expected CFArray of length 2, but got %lu",
+                      "Expected CFArray of length 1 or 2, but got %lu",
                       (unsigned long) al.size);
             dest->error = MY_STRDUP (buf);
         }
@@ -145,7 +145,7 @@ static ErrorCode parse_wherefroms (Attributes *dest,
         dest->url = MY_STRDUP (al.strings[0]);
     }
 
-    if (dest->referrer == NULL && *(al.strings[1]) != 0) {
+    if (al.size > 1 && dest->referrer == NULL && *(al.strings[1]) != 0) {
         dest->referrer = MY_STRDUP (al.strings[1]);
     }
 
