@@ -50,7 +50,7 @@ typedef struct ZoneCache {
 
 #ifdef __APPLE__
 typedef DatabaseConnection Cache;
-#elif define (_WIN32)
+#elif defined (_WIN32)
 typedef ZoneCache Cache;
 #else
 typedef int Cache;              /* dummy */
