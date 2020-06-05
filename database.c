@@ -60,8 +60,7 @@ static void handleKey (const char *key, const char *value, Attributes *dest) {
     }
 
     if (field != NULL && *field == NULL) {
-        *field = strdup (value);
-        CHECK_NULL (*field);
+        *field = MY_STRDUP (value);
     }
 }
 
@@ -96,8 +95,7 @@ static ErrorCode run_query (Attributes *dest, const char *uuid, sqlite3 *sq) {
     if (err != SQLITE_OK) {
         const char *msg = errmsg ? errmsg : "unknown";
         if (dest->error == NULL) {
-            dest->error = strdup (msg);
-            CHECK_NULL (dest->error);
+            dest->error = MY_STRDUP (msg);
         }
         ec = EC_OTHER;
         goto done;

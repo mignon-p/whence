@@ -10,8 +10,7 @@ void AL_init (ArrayList *al) {
 }
 
 void AL_add (ArrayList *al, const char *str) {
-    char *newStr = strdup (str);
-    CHECK_NULL (newStr);
+    char *newStr = MY_STRDUP (str);
     AL_add_nocopy (al, newStr);
 }
 

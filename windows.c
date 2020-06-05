@@ -28,8 +28,7 @@ ErrorCode getAttribute (const char *fname,
     FILE *f = fopen (streamName, "r");
     if (!f) {
         const int errnum = errno;
-        *result = strdup (strerror (errnum));
-        CHECK_NULL (*result);
+        *result = MY_STRDUP (strerror (errnum));
         *length = strlen (*result);
 
         if (_access (fname, 0) == 0) {
@@ -59,8 +58,7 @@ ErrorCode getAttribute (const char *fname,
     }
 
     if (ferror (f)) {
-        *result = strdup (strerror (errno));
-        CHECK_NULL (*result);
+        *result = MY_STRDUP (strerror (errno));
         *length = strlen (*result);
         ec = EC_OTHER;
         goto done;
@@ -96,8 +94,7 @@ static int handleKey (const char *key,
     }
 
     if (field) {
-        *field = strdup (value);
-        CHECK_NULL (*field);
+        *field = MY_STRDUP (value);
         return 1;
     } else {
         return 0;

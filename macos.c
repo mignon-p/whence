@@ -59,8 +59,7 @@ static ErrorCode parse_quarantine (Attributes *dest,
                       "Expected at least 3 fields in com.apple.quarantine, "
                       "but got %lu",
                       (unsigned long) al.size);
-            dest->error = strdup (buf);
-            CHECK_NULL (dest->error);
+            dest->error = MY_STRDUP (buf);
         }
 
         AL_cleanup (&al);
@@ -82,7 +81,7 @@ static ErrorCode parse_quarantine (Attributes *dest,
         char buf[80];
         if (dest->error == NULL) {
             if (errnum != 0) {
-                dest->error = strdup (strerror (errnum));
+                dest->error = MY_STRDUP (strerror (errnum));
             } else {
                 snprintf (buf, sizeof (buf),
                           "'%s' is not a valid hex number.", hexdate);
@@ -122,8 +121,7 @@ static ErrorCode parse_wherefroms (Attributes *dest,
     if (ec != EC_OK) {
         if (dest->error == NULL) {
             dest->error =
-                strdup (al.size == 1 ? al.strings[0] : "Unknown error");
-            CHECK_NULL (dest->error);
+                MY_STRDUP (al.size == 1 ? al.strings[0] : "Unknown error");
         }
 
         AL_cleanup (&al);
@@ -136,8 +134,7 @@ static ErrorCode parse_wherefroms (Attributes *dest,
             snprintf (buf, sizeof (buf),
                       "Expected CFArray of length 2, but got %lu",
                       (unsigned long) al.size);
-            dest->error = strdup (buf);
-            CHECK_NULL (dest->error);
+            dest->error = MY_STRDUP (buf);
         }
 
         AL_cleanup (&al);
@@ -145,13 +142,11 @@ static ErrorCode parse_wherefroms (Attributes *dest,
     }
 
     if (dest->url == NULL) {
-        dest->url = strdup (al.strings[0]);
-        CHECK_NULL (dest->url);
+        dest->url = MY_STRDUP (al.strings[0]);
     }
 
     if (dest->referrer == NULL) {
-        dest->referrer = strdup (al.strings[1]);
-        CHECK_NULL (dest->referrer);
+        dest->referrer = MY_STRDUP (al.strings[1]);
     }
 
     AL_cleanup (&al);

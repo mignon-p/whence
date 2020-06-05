@@ -67,16 +67,14 @@ ErrorCode getAttribute (const char *fname,
         const int errnum = errno;
         const char *errmsg = strerror (errnum);
         free (*result);
-        *result = strdup (errmsg);
-        CHECK_NULL (*result);
+        *result = MY_STRDUP (errmsg);
         *length = strlen (*result);
         return errnum2ec (errnum);
     }
 
     if (ret1 != ret2) {
         free (*result);
-        *result = strdup ("attribute size mismatch");
-        CHECK_NULL (*result);
+        *result = MY_STRDUP ("attribute size mismatch");
         *length = strlen (*result);
         return EC_OTHER;
     }
