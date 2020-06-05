@@ -141,11 +141,11 @@ static ErrorCode parse_wherefroms (Attributes *dest,
         return EC_OTHER;
     }
 
-    if (dest->url == NULL) {
+    if (dest->url == NULL && *(al.strings[0]) != 0) {
         dest->url = MY_STRDUP (al.strings[0]);
     }
 
-    if (dest->referrer == NULL) {
+    if (dest->referrer == NULL && *(al.strings[1]) != 0) {
         dest->referrer = MY_STRDUP (al.strings[1]);
     }
 
