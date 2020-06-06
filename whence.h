@@ -71,9 +71,15 @@ ErrorCode getAttribute (const char *fname,
                         size_t *length);
 
 /* util.c */
+extern bool colorize_errors;
 void oom (const char *file, long line);
 ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2);
 char *my_strdup (const char *s, const char *file, long line);
+void err_printf (const char *fmt, ...)
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 1, 2)))
+#endif
+    ;
 
 /* array-list.c */
 void AL_init (ArrayList *al);
