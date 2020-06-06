@@ -73,11 +73,11 @@ const char *getZoneName (const char *zoneNumber, ZoneCache *zc) {
     char *name = lookupZoneName (zoneNumber);
     AL_add (&zc->keys, zoneNumber);
     if (name) {
-        AL_add_nocopy (&zc->keys, name);
+        AL_add_nocopy (&zc->values, name);
     } else {
         /* If no name found, cache the zone number as the name,
          * so we don't keep looking it up every time. */
-        AL_add (&zc->keys, zoneNumber);
+        AL_add (&zc->values, zoneNumber);
     }
 
     return (name ? name : zoneNumber);
