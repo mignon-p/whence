@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
+#include <errno.h>
 
 static void print_usage (void) {
     fprintf (stderr, "Usage: " CMD_NAME " [OPTIONS] FILE ...\n\n");
@@ -75,9 +76,14 @@ int main (int argc, char **orig_argv) {
     const bool colorize = (!json &&
                            isatty (STDOUT_FILENO) &&
                            enableColorEscapes (STDOUT_FILENO));
+    colorize_errors =
+        isatty (STDERR_FILENO) && enableColorEscapes (STDERR_FILENO);
+
+#ifdef __APPLE__                /* we only format time on MacOS */
     if (NULL == setlocale (LC_TIME, "")) {
-        perror ("setlocale");
+        err_printf ("setlocale: %s", strerror (errno));
     }
+#endif
 
     if (json) {
         printf ("{\n");

@@ -178,7 +178,7 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     bool firstField = true;
 
     if (attrs->error != NULL && !is_json (style)) {
-        err_printf ("%s: %s\n", fname, attrs->error);
+        err_printf ("%s: %s", fname, attrs->error);
         return;
     }
 

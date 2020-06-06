@@ -127,7 +127,7 @@ static sqlite3 *get_database (DatabaseConnection *conn) {
     const int err = sqlite3_open_v2 (dbname, &sq, SQLITE_OPEN_READONLY, NULL);
     CHECK_NULL (sq);            /* should only be NULL if out of memory */
     if (err != SQLITE_OK) {
-        err_printf ("%s: %s\n", dbname, sqlite3_errmsg (sq));
+        err_printf ("%s: %s", dbname, sqlite3_errmsg (sq));
         sqlite3_close (sq);
         free (dbname);
         return NULL;

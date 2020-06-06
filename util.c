@@ -17,7 +17,7 @@ static const char *my_basename (const char *file) {
 }
 
 void oom (const char *file, long line) {
-    err_printf (CMD_NAME ": out of memory at %s:%ld\n",
+    err_printf (CMD_NAME ": out of memory at %s:%ld",
                 my_basename (file), line);
     exit (EC_MEM);
 }
@@ -36,7 +36,7 @@ ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2) {
 
 char *my_strdup (const char *s, const char *file, long line) {
     if (s == NULL) {
-        err_printf (CMD_NAME ": strdup called on NULL at %s:%ld\n",
+        err_printf (CMD_NAME ": strdup called on NULL at %s:%ld",
                     my_basename (file), line);
         exit (EC_OTHER);
     }
