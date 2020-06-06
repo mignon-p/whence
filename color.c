@@ -28,6 +28,10 @@ bool enableColorEscapes (int fd) {
         return false;
     }
 
+    if (0 != (oldMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING)) {
+        return true;            /* already enabled */
+    }
+
     consoleHandle = h;
     if (0 != atexit (restore_mode)) {
         return false;

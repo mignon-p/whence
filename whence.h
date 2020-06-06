@@ -64,7 +64,7 @@ typedef int Cache;              /* dummy */
 
 #define MY_STRDUP(x) my_strdup ((x), __FILE__, __LINE__)
 
-/* getattr.c */
+/* getattr.c or windows.c */
 ErrorCode getAttribute (const char *fname,
                         const char *attr,
                         char **result,
