@@ -117,40 +117,50 @@ static ErrorCode parse_wherefroms (Attributes *dest,
     ArrayList al;
 
     AL_init (&al);
-    const ErrorCode ec = props2list (attr, attrLen, &al);
+    ErrorCode ec = props2list (attr, attrLen, &al);
     if (ec != EC_OK) {
+        // Error
         if (dest->error == NULL) {
             dest->error =
                 MY_STRDUP (al.size == 1 ? al.strings[0] : "Unknown error");
         }
+    } else if (al.size == 1 || al.size == 2) {
+        // Website: URL and Referrer
+        if (dest->url == NULL && *(al.strings[0]) != 0) {
+            dest->url = MY_STRDUP (al.strings[0]);
+        }
 
-        AL_cleanup (&al);
-        return ec;
-    }
+        if (al.size > 1 && dest->referrer == NULL && *(al.strings[1]) != 0) {
+            dest->referrer = MY_STRDUP (al.strings[1]);
+        }
+    } else if (al.size == 3) {
+        // Email: From, Subject, and Message-ID
+        if (dest->from == NULL && *(al.strings[0]) != 0) {
+            dest->from = MY_STRDUP (al.strings[0]);
+        }
 
-    if (al.size < 1 || al.size > 2) {
+        if (dest->subject == NULL && *(al.strings[1]) != 0) {
+            dest->subject = MY_STRDUP (al.strings[1]);
+        }
+
+        if (dest->message_id == NULL && *(al.strings[2]) != 0) {
+            dest->message_id = MY_STRDUP (al.strings[2]);
+        }
+    } else {
+        // Unknown
         if (dest->error == NULL) {
             char buf[80];
             snprintf (buf, sizeof (buf),
-                      "Expected CFArray of length 1 or 2, but got %lu",
+                      "Expected CFArray of length 1-3, but got %lu",
                       (unsigned long) al.size);
             dest->error = MY_STRDUP (buf);
         }
 
-        AL_cleanup (&al);
-        return EC_OTHER;
-    }
-
-    if (dest->url == NULL && *(al.strings[0]) != 0) {
-        dest->url = MY_STRDUP (al.strings[0]);
-    }
-
-    if (al.size > 1 && dest->referrer == NULL && *(al.strings[1]) != 0) {
-        dest->referrer = MY_STRDUP (al.strings[1]);
+        ec = EC_OTHER;
     }
 
     AL_cleanup (&al);
-    return EC_OK;
+    return ec;
 }
 
 ErrorCode getAttributes (const char *fname,

@@ -202,6 +202,9 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     p->print_fname (fname, isEmpty (attrs));
     PR("URL", attrs->url);
     PR("Referrer", attrs->referrer);
+    PR("From", attrs->from);
+    PR("Subject", attrs->subject);
+    PR("Message-ID", attrs->message_id);
     PR("Application", attrs->application);
     PR("Date", date);
     PR("Zone", attrs->zone);
@@ -214,6 +217,9 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
 void Attr_cleanup (Attributes *attrs) {
     free (attrs->url);
     free (attrs->referrer);
+    free (attrs->from);
+    free (attrs->subject);
+    free (attrs->message_id);
     free (attrs->application);
     free (attrs->zone);
     free (attrs->error);

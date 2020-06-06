@@ -25,6 +25,9 @@ typedef struct ArrayList {
 typedef struct Attributes {
     char *url;
     char *referrer;
+    char *from;
+    char *subject;
+    char *message_id;
     char *application;
     time_t date;
     char *zone;
