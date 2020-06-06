@@ -35,15 +35,7 @@ static bool is_option (const char *arg, const char *opt1, const char *opt2) {
     }
 }
 
-int main (int argc, char **orig_argv) {
-    /* Weird things happen if I don't make a copy of argv.  This must
-     * mean there is a bug somewhere, but I can't find it.
-     */
-    const size_t argv_size = sizeof (char *) * argc;
-    char **argv = malloc (argv_size);
-    CHECK_NULL (argv);
-    memcpy (argv, orig_argv, argv_size);
-
+int main (int argc, char **argv) {
     bool json = false;
     int arg1 = 1;
 
@@ -54,13 +46,11 @@ int main (int argc, char **orig_argv) {
 
     if (arg1 < argc && is_option (argv[arg1], "-h", "--help")) {
         print_usage ();
-        free (argv);
         return EC_OK;
     }
 
     if (arg1 < argc && is_option (argv[arg1], "-v", "--version")) {
         print_version ();
-        free (argv);
         return EC_OK;
     }
 
@@ -115,6 +105,5 @@ int main (int argc, char **orig_argv) {
     }
 
     Cache_cleanup (&cache);
-    free (argv);
     return ec;
 }

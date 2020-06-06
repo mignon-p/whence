@@ -59,7 +59,6 @@ ErrorCode getAttribute (const char *fname,
     if (ret1 >= 0) {
         *result = malloc (ret1 + 1); /* leave room for NUL terminator */
         CHECK_NULL (*result);
-        memset (*result, 0, ret1 + 1); /* why is this needed? */
         ret2 = call_getxattr (fname, attr, *result, ret1 + 1);
     }
 
