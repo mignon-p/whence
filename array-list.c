@@ -22,6 +22,7 @@ void AL_add_nocopy (ArrayList *al, char *str) {
         }
         al->strings = realloc (al->strings, newCap * sizeof (char *));
         CHECK_NULL (al->strings);
+	al->capacity = newCap;
     }
 
     al->strings[al->size++] = str;
