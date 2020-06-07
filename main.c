@@ -82,13 +82,14 @@ int main (int argc, char **argv) {
 
     bool first = true;
     ErrorCode ec = EC_OK;
+    int32_t drives = -1;        /* only used on Windows */
 
     if (json) {
         printf ("{\n");
     }
 
     for ( ; arg1 < argc; arg1++) {
-        const char *fname = argv[arg1];
+        char *fname = fixFilename (argv[arg1], &drives);
         const ErrorCode ec2 = getAttributes (fname, &attr, &cache);
         AttrStyle style = (colorize ? AS_HUMAN_COLOR : AS_HUMAN);
 
@@ -106,6 +107,7 @@ int main (int argc, char **argv) {
         }
 
         first = false;
+        free (fname);
     }
 
     if (json) {

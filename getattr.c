@@ -86,4 +86,12 @@ ErrorCode getAttribute (const char *fname,
     return EC_OK;
 }
 
+/* This function only does anything on Windows (see windows.c).
+ * On UNIX, all we have to do is copy the filename, so it can
+ * be freed later.
+ */
+char *fixFilename (const char *fname, int32_t *drives) {
+    return MY_STRDUP (fname);
+}
+
 #endif  /* not _WIN32 */

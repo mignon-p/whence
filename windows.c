@@ -2,6 +2,9 @@
 
 #ifdef _WIN32
 
+#define WIN32_LEAN_AND_MEAN
+
+#include <Windows.h>
 #include <stdio.h>
 #include <io.h>
 #include <string.h>
@@ -144,6 +147,59 @@ ErrorCode getAttributes (const char *fname,
     const int numAttrs = parseZoneIdentifier (result, dest, zc);
     free (result);
     return (numAttrs == 0 ? EC_NOATTR : EC_OK);
+}
+
+static bool haveDrive (char drive, int32_t *drives) {
+    const int n = drive - 'A';
+
+    if (n < 0 || n >= 26) {
+        return false;
+    }
+
+    if (*drives == -1) {
+        *drives = GetLogicalDrives ();
+    }
+
+    return (((*drives >> n) & 1) != 0);
+}
+
+/* So, I've noticed a weird problem I don't really understand.
+ * Normally, on Windows, absolute filenames get passed like this:
+ *   C:/foo/bar/User Guide.pdf
+ *
+ * However, if the filename contains the single quote character "'",
+ * it instead gets passed like this:
+ *   /c/foo/bar/User's Guide.pdf
+ *
+ * fopen() knows how to open the "C:/" form, but doesn't seem to be
+ * able to open the "/c/" form.
+ *
+ * This function rewrites "/c/" to "C:/", only if:
+ *   - The original filename is not accessible
+ *   - The drive letter exists
+ *   - The file is accessible under the new name
+ */
+char *fixFilename (const char *fname, int32_t *drives) {
+    char *s = MY_STRDUP (fname);
+
+    if (s[0] == '/' && isalpha (s[1]) && s[2] == '/') {
+        if (_access (s, 0) != 0 && errno == ENOENT) {
+            const char drive = toupper (s[1]);
+            if (haveDrive (drive, drives)) {
+                char buf[3];
+                memcpy (buf, s, sizeof (buf));
+                s[0] = drive;
+                s[1] = ':';
+                if (_access (s, 0) != 0) {
+                    /* If we still can't access the file, restore the
+                     * original filename. */
+                    memcpy (s, buf, sizeof (buf));
+                }
+            }
+        }
+    }
+
+    return s;
 }
 
 #endif  /* _WIN32 */

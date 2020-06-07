@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <time.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #define CMD_NAME "whence"
 
@@ -69,6 +70,7 @@ ErrorCode getAttribute (const char *fname,
                         const char *attr,
                         char **result,
                         size_t *length);
+char *fixFilename (const char *fname, int32_t *drives);
 
 /* util.c */
 extern bool colorize_errors;
