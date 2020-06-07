@@ -23,6 +23,15 @@ static void print_usage (void) {
 
 static void print_version (void) {
     fprintf (stderr, CMD_NAME " 0.9\n");
+#ifdef __clang_version__
+    fprintf (stderr, "Built with clang %s\n", __clang_version__);
+#elif defined (__GNUC__) && defined (__VERSION__)
+    fprintf (stderr, "Built with GCC %s\n", __VERSION__);
+#endif
+    fprintf (stderr,
+             "Copyright (c) 2020 Patrick Pelletier\n"
+             "MIT License: <https://en.wikipedia.org/wiki/MIT_License#License_terms>\n"
+             "For more information see <https://github.com/ppelleti/whence>\n");
 }
 
 static bool is_option (const char *arg, const char *opt1, const char *opt2) {
