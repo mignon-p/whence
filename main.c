@@ -54,6 +54,26 @@ int main (int argc, char **argv) {
         return EC_OK;
     }
 
+    const bool colorize = (!json &&
+                           isatty (STDOUT_FILENO) &&
+                           enableColorEscapes (STDOUT_FILENO));
+    colorize_errors =
+        isatty (STDERR_FILENO) && enableColorEscapes (STDERR_FILENO);
+
+#ifdef __APPLE__                /* we only format time on MacOS */
+    if (!json && NULL == setlocale (LC_TIME, "")) {
+        err_printf ("setlocale: %s", strerror (errno));
+    }
+#endif
+
+    const int nFiles = argc - arg1;
+
+    if (!json && nFiles == 0) {
+        err_printf (CMD_NAME ": No files specified on command line");
+        print_usage ();
+        return EC_CMDLINE;
+    }
+
     Cache cache;
     Cache_init (&cache);
 
@@ -62,18 +82,6 @@ int main (int argc, char **argv) {
 
     bool first = true;
     ErrorCode ec = EC_OK;
-
-    const bool colorize = (!json &&
-                           isatty (STDOUT_FILENO) &&
-                           enableColorEscapes (STDOUT_FILENO));
-    colorize_errors =
-        isatty (STDERR_FILENO) && enableColorEscapes (STDERR_FILENO);
-
-#ifdef __APPLE__                /* we only format time on MacOS */
-    if (NULL == setlocale (LC_TIME, "")) {
-        err_printf ("setlocale: %s", strerror (errno));
-    }
-#endif
 
     if (json) {
         printf ("{\n");
@@ -102,6 +110,11 @@ int main (int argc, char **argv) {
 
     if (json) {
         printf ("}\n");
+    }
+
+    if (ec == EC_NOATTR && !json) {
+        err_printf ("%s: No attributes found",
+                    (nFiles == 1 ? argv[argc - 1] : CMD_NAME));
     }
 
     Cache_cleanup (&cache);
