@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ `uname` == 'Darwin' ]
 then
     exec gcc -o whence -framework CoreFoundation -lsqlite3 -Wall -O3 *.c
