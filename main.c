@@ -31,6 +31,20 @@
 #include <locale.h>
 #include <errno.h>
 
+#ifdef __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
+static void get_min_osx (int *major, int *minor) {
+    // https://gcc.gnu.org/legacy-ml/gcc-patches/2014-08/msg02428.html
+    const int v = __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__;
+    if (v < 10000) {
+        *major = v / 100;
+        *minor = (v / 10) % 10;
+    } else {
+        *major = v / 10000;
+        *minor = (v / 100) % 100;
+    }
+}
+#endif  /* __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ */
+
 static void print_usage (void) {
     fprintf (stderr, "Usage: " CMD_NAME " [OPTIONS] FILE ...\n\n");
     fprintf (stderr, "%-30s%s\n",
@@ -45,13 +59,25 @@ static void print_usage (void) {
 }
 
 static void print_version (void) {
-    fprintf (stderr, CMD_NAME " 0.9\n");
+    fprintf (stderr, CMD_NAME " " CMD_VERSION "\n");
+
 #ifdef __clang_version__
     fprintf (stderr, "Built with clang %s\n", __clang_version__);
 #elif defined (__GNUC__) && defined (__VERSION__)
     fprintf (stderr, "Built with GCC %s\n", __VERSION__);
 #endif
-    fprintf (stderr,
+
+#ifdef __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
+    int major, minor;
+    get_min_osx (&major, &minor);
+    fprintf (stderr, "Built for Mac OS %d.%d and up\n", major, minor);
+#endif
+
+#ifdef __APPLE__
+    fprintf (stderr, "SQLite version %s\n", get_sqlite_version());
+#endif
+
+    fprintf (stderr, "\n"
              "Copyright (c) 2020 Patrick Pelletier\n"
              "MIT License: <https://en.wikipedia.org/wiki/MIT_License#License_terms>\n"
              "For more information see <https://github.com/ppelleti/whence>\n");
