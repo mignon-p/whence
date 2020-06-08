@@ -185,8 +185,17 @@ void Cache_cleanup (DatabaseConnection *conn) {
     }
 }
 
-const char *get_sqlite_version (void) {
-    return sqlite3_libversion();
+char *get_sqlite_version (void) {
+    ArrayList al;
+
+    AL_init (&al);
+    AL_add (&al, "SQLite version ");
+    AL_add (&al, sqlite3_libversion());
+    AL_add (&al, " (header version " SQLITE_VERSION ")");
+    char *ret = AL_join (&al);
+    AL_cleanup (&al);
+
+    return ret;
 }
 
 #endif  /* __APPLE__ */

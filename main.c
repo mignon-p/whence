@@ -74,7 +74,9 @@ static void print_version (void) {
 #endif
 
 #ifdef __APPLE__
-    fprintf (stderr, "SQLite version %s\n", get_sqlite_version());
+    char *sqv = get_sqlite_version ();
+    fprintf (stderr, "%s\n", sqv);
+    free (sqv);
 #endif
 
     fprintf (stderr, "\n"

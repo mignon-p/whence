@@ -142,7 +142,7 @@ bool enableColorEscapes (int fd);
 ErrorCode lookup_uuid (Attributes *dest,
                        const char *uuid,
                        DatabaseConnection *conn);
-const char *get_sqlite_version (void);
+char *get_sqlite_version (void);
 
 /* registry.c */
 const char *getZoneName (const char *zoneNumber, ZoneCache *zc);
