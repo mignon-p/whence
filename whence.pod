@@ -1,0 +1,159 @@
+=pod
+
+=head1 NAME
+
+whence - prints the website a file was downloaded from
+
+=head1 SYNOPSIS
+
+B<whence> [I<OPTIONS>] I<FILE>...
+
+=head1 DESCRIPTION
+
+B<whence> examines extended file attributes on the given I<FILE>s to
+determine the URL of the website that the file was originally
+downloaded from.  Most web browsers set these extended attributes when
+downloading a file, although some may not.
+
+B<whence> can usually determine both the URL that the file was
+downloaded from, and the URL of the web page which linked to the
+file.  On MacOS, B<whence> can also determine the name of the
+application which downloaded the file, and the date it was
+downloaded.  On Windows, B<whence> can determine the security zone
+the file was downloaded from.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-j>, B<--json>
+
+Print results in JSON format.
+
+=item B<-h>, B<--help>
+
+Print usage message and exit.
+
+=item B<-v>, B<--version>
+
+Print the version number of B<whence> and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Example of human-readable output:
+
+    bash$ whence wget-1.20.tar.gz
+    wget-1.20.tar.gz:
+      URL         https://ftp.gnu.org/gnu/wget/wget-1.20.tar.gz
+      Referrer    https://ftp.gnu.org/gnu/wget/
+      Application Firefox
+      Date        Sun Jun  7 11:30:18 PDT 2020
+
+Example of JSON output:
+
+    bash$ whence -j em*.pdf
+    {
+      "emailreceipt_20131027R1549504934.pdf": {
+        "from": "theoaks@apple.com",
+        "subject": "Your receipt from Apple Store, The Oaks",
+        "message-id": "message:%3C63901179@alwar.corp.apple.com%3E",
+        "application": "Mail",
+        "date": "2013-10-27T22:26:50Z"
+      },
+      "emic2_schematic.pdf": {
+        "url": "http://www.grandideastudio.com/emic2_schematic.pdf",
+        "application": "Chromium",
+        "date": "2020-03-29T10:11:17Z"
+      }
+    }
+
+=head1 JSON FORMAT
+
+When the B<-j> option is used, B<whence> prints a JSON object to
+stdout.  The keys of the object are filenames, and the values of the
+object are themselves objects which may contain the following keys:
+
+=over
+
+=item url
+
+URL that the file was downloaded from.
+
+=item referrer
+
+URL of the page which linked to the file.
+
+=item from
+
+For email messages, who the message is from.
+
+=item subject
+
+For email messages, the subject of the message.
+
+=item message-id
+
+For email messages, the Message ID of the message.
+
+=item application
+
+The name of the application that downloaded the file.  (MacOS only)
+
+=item date
+
+The date that the file was downloaded, in ISO 8601 format.  (MacOS only)
+
+=item zone
+
+The security zone that the file was downloaded from.  (Windows only)
+
+=item error
+
+Error message if there was a problem processing the file.
+
+=back
+
+=head1 EXIT STATUS
+
+=over
+
+=item 0
+
+Attributes were found on at least one I<FILE> given on the command line.
+
+=item 1
+
+Attributes were not found on any I<FILE> given on the command line.
+
+=item 2
+
+At least one I<FILE> was not found.
+
+=item 3
+
+Some other error occurred.
+
+=item 4
+
+Command line parsing error.
+
+=item 5
+
+Out of memory.
+
+=back
+
+=head1 SEE ALSO
+
+xattr(1)
+
+=head1 AUTHOR
+
+B<whence> was written by Patrick Pelletier and is distributed under
+the MIT license.
+
+For more information, see <https://github.com/ppelleti/whence>.
+
+=cut
