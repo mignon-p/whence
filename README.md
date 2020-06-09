@@ -1,8 +1,8 @@
 Web browsers often use [extended attributes][1] to store the URL that
 a file was downloaded from.  Sometimes I have a file lying around and
 want to know where it was downloaded from, so I wrote the `whence`
-command as an easy way to access this information on all three major
-platforms (Linux, MacOS, and Windows).
+command as an easy way to access this information on several major
+platforms (FreeBSD, Linux, MacOS, and Windows).
 
 ## Usage
 
@@ -38,9 +38,9 @@ as part of the operating system.
 
 ## Extended Attributes
 
-### Linux
+### Linux and FreeBSD
 
-On Linux, the following extended attributes from
+On Linux and FreeBSD, the following extended attributes from
 [Common Extended Attributes][2] are used:
 
 * `user.xdg.origin.url`
