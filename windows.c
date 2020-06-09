@@ -186,7 +186,9 @@ static bool haveDrive (char drive, int32_t *drives) {
     return (((*drives >> n) & 1) != 0);
 }
 
-/* So, I've noticed a weird problem I don't really understand.
+/* Problem #1:
+ *
+ * So, I've noticed a weird problem I don't really understand.
  * Normally, on Windows, absolute filenames get passed like this:
  *   C:/foo/bar/User Guide.pdf
  *
@@ -201,25 +203,43 @@ static bool haveDrive (char drive, int32_t *drives) {
  *   - The original filename is not accessible
  *   - The drive letter exists
  *   - The file is accessible under the new name
+ *
+ * Problem #2:
+ *
+ * If filename is a single letter, such as "c", then when we append
+ * the stream name, it looks like "c:Zone.Identifier", which would be
+ * interpreted as a file "Zone.Identifier" in the current directory of
+ * drive C.  Therefore, in the case of single letter filenames, prepend
+ * "./" so it doesn't look like a drive letter.
  */
 char *fixFilename (const char *fname, int32_t *drives) {
     char *s = MY_STRDUP (fname);
 
+    /* Problem #1 */
     if (s[0] == '/' && isalpha (s[1]) && s[2] == '/') {
         if (_access (s, 0) != 0 && errno == ENOENT) {
             const char drive = toupper (s[1]);
             if (haveDrive (drive, drives)) {
-                char buf[3];
-                memcpy (buf, s, sizeof (buf));
                 s[0] = drive;
                 s[1] = ':';
                 if (_access (s, 0) != 0) {
                     /* If we still can't access the file, restore the
                      * original filename. */
-                    memcpy (s, buf, sizeof (buf));
+                    s[0] = fname[0];
+                    s[1] = fname[1];
                 }
             }
         }
+    }
+
+    /* Problem #2 */
+    if (isalnum(s[0]) && s[1] == 0) {
+        s = realloc (s, 4);
+        CHECK_NULL (s);
+        s[0] = '.';
+        s[1] = '/';
+        s[2] = fname[0];
+        s[3] = 0;
     }
 
     return s;
