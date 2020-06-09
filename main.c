@@ -31,6 +31,9 @@
 #include <locale.h>
 #include <errno.h>
 
+static const char moreinfo[] =
+    "For more information see <https://github.com/ppelleti/whence>";
+
 #ifdef __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
 static void get_min_osx (int *major, int *minor) {
     // https://gcc.gnu.org/legacy-ml/gcc-patches/2014-08/msg02428.html
@@ -56,15 +59,21 @@ static void print_usage (void) {
     fprintf (stderr, "%-30s%s\n",
              "  -v, --version",
              "Print the version number of " CMD_NAME " and exit.");
+    fprintf (stderr, "\n%s\n", moreinfo);
 }
 
 static void print_version (void) {
     fprintf (stderr, CMD_NAME " " CMD_VERSION "\n");
 
+    const char* optimize = "";
+#ifdef __OPTIMIZE__
+    optimize = " (optimized)";
+#endif
+
 #ifdef __clang_version__
-    fprintf (stderr, "Built with clang %s\n", __clang_version__);
+    fprintf (stderr, "Built with clang %s%s\n", __clang_version__, optimize);
 #elif defined (__GNUC__) && defined (__VERSION__)
-    fprintf (stderr, "Built with GCC %s\n", __VERSION__);
+    fprintf (stderr, "Built with GCC %s%s\n", __VERSION__, optimize);
 #endif
 
 #ifdef __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
@@ -82,7 +91,7 @@ static void print_version (void) {
     fprintf (stderr, "\n"
              "Copyright (c) 2020 Patrick Pelletier\n"
              "MIT License: <https://en.wikipedia.org/wiki/MIT_License#License_terms>\n"
-             "For more information see <https://github.com/ppelleti/whence>\n");
+             "%s\n", moreinfo);
 }
 
 static bool is_option (const char *arg, const char *opt1, const char *opt2) {
