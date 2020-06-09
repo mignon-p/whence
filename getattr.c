@@ -31,21 +31,28 @@
 
 #ifdef __APPLE__
 #include <sys/xattr.h>
-#else
+#elif defined(__FreeBSD__)
+#include <sys/types.h>
+#include <sys/extattr.h>
+#elif defined(__linux__)
 #include <sys/types.h>
 #include <sys/xattr.h>
 // #include <attr/xattr.h>
+#else
+#error "Unknown operating system"
 #endif
 
 static ssize_t call_getxattr (const char *path,
                               const char *name,
                               char *value,
                               size_t size) {
-    return getxattr (path, name, value, size
 #ifdef __APPLE__
-                     , 0, 0
+    return getxattr (path, name, value, size, 0, 0);
+#elif defined(__FreeBSD__)
+    return extattr_get_file (path, EXTATTR_NAMESPACE_USER, name, value, size);
+#elif defined (__linux__)
+    return getxattr (path, name, value, size);
 #endif
-                     );
 }
 
 static ErrorCode errnum2ec (int errnum) {

@@ -23,7 +23,7 @@
 
 #include "whence.h"
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 
 /* For more information:
  * https://www.freedesktop.org/wiki/CommonExtendedAttributes/
@@ -81,4 +81,4 @@ void Cache_cleanup (Cache *cache) {
     // do nothing
 }
 
-#endif  /* __linux__ */
+#endif  /* defined(__linux__) || defined(__FreeBSD__) */
