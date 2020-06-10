@@ -25,16 +25,33 @@ wget-1.20.tar.gz:
   Date        Sun Jun  7 11:30:18 PDT 2020
 ```
 
-## Installation
+## Download and install
 
-Run `./build.sh` to build.  Then copy `whence` to `/usr/local/bin` and
-copy `whence.1` to `/usr/local/share/man/man1`.
+### Pre-built binaries
+
+For release [0.9](https://github.com/ppelleti/whence/releases/tag/0.9):
+
+* [FreeBSD, arm64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-freebsd-arm64.tar.bz2)
+* [Linux, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-linux-x86_64.tar.bz2)
+* [MacOS, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-macos-x86_64.tar.bz2)
+* [Windows, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-windows-x86_64.zip)
+
+### Building from source
+
+Run `./build.sh` to build.
 
 On Windows, MinGW is assumed.  I haven't attempted to get it working
 with MSVC.
 
 On MacOS, [SQLite 3][8] is required, but it should already be present
 as part of the operating system.
+
+### Installation
+
+On Windows, copy `whence.exe` to a directory on your `PATH`.
+
+On other platforms, copy `whence` to `/usr/local/bin` and
+copy `whence.1` to `/usr/local/share/man/man1`.
 
 ## Extended Attributes
 
