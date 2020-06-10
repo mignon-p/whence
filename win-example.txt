@@ -1,6 +1,0 @@
-make-4.2.tar.bz2:
-[ZoneTransfer]
-ZoneId=3
-ReferrerUrl=https://mirrors.ocf.berkeley.edu/gnu/make/
-HostUrl=https://mirrors.ocf.berkeley.edu/gnu/make/make-4.2.tar.bz2
-
