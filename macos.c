@@ -223,6 +223,15 @@ ErrorCode getAttributes (const char *fname,
         result = NULL;
     }
 
+    if (ec1 != EC_NOFILE) {
+        /* curl and wget use the attribute "user.xdg.origin.url" on
+         * all platforms, including MacOS.  Therefore, check the
+         * XDG attributes in addition to the MacOS ones we just
+         * checked above. */
+        const ErrorCode ec2 = getAttributes_xdg (fname, dest);
+        ec1 = combineErrors (ec1, ec2);
+    }
+
     return ec1;
 }
 

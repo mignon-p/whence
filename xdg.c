@@ -23,7 +23,7 @@
 
 #include "whence.h"
 
-#if defined(__linux__) || defined(__FreeBSD__)
+#ifndef _WIN32
 
 /* For more information:
  * https://www.freedesktop.org/wiki/CommonExtendedAttributes/
@@ -56,9 +56,18 @@ static ErrorCode handle_attribute (const char *fname,
 #define A1(s, f) ErrorCode ec = ATTR(s, f)
 #define AN(s, f) ec = combineErrors (ec, ATTR(s, f))
 
+/* On MacOS, the getAttributes() in osx.c calls getAttributes_xdg(), so
+ * that both MacOS and XDG attributes are supported.
+ */
+#ifdef __APPLE__
+ErrorCode getAttributes_xdg (const char *fname,
+                             Attributes *dest)
+#else
 ErrorCode getAttributes (const char *fname,
                          Attributes *dest,
-                         Cache *cache) {
+                         Cache *cache)
+#endif
+{
     A1("user.xdg.origin.url", url);
     AN("user.xdg.referrer.url", referrer);
     AN("user.xdg.origin.email.from", from);
@@ -73,6 +82,11 @@ ErrorCode getAttributes (const char *fname,
 #undef A1
 #undef ATTR
 
+#ifndef __APPLE__
+
+/* On MacOS, these are defined in database.c instead.
+ * For Linux and FreeBSD, they are no-ops. */
+
 void Cache_init (Cache *cache) {
     // do nothing
 }
@@ -81,4 +95,6 @@ void Cache_cleanup (Cache *cache) {
     // do nothing
 }
 
-#endif  /* defined(__linux__) || defined(__FreeBSD__) */
+#endif  /* not __APPLE__ */
+
+#endif  /* not _WIN32 */

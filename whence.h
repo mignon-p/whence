@@ -30,7 +30,7 @@
 #include <stdint.h>
 
 #define CMD_NAME "whence"
-#define CMD_VERSION "0.9"
+#define CMD_VERSION "0.9.1"
 
 typedef enum ErrorCode {
     EC_OK = 0,
@@ -126,12 +126,16 @@ void Attr_init (Attributes *attrs);
 void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style);
 void Attr_cleanup (Attributes *attrs);
 
-/* linux.c, macos.c, or windows.c */
+/* xdg.c, macos.c, or windows.c */
 ErrorCode getAttributes (const char *fname,
                          Attributes *dest,
                          Cache *cache);
 
-/* linux.c, database.c, or registry.c */
+/* xdg.c (only on Mac OS) */
+ErrorCode getAttributes_xdg (const char *fname,
+                             Attributes *dest);
+
+/* xdg.c, database.c, or registry.c */
 void Cache_init (Cache *cache);
 void Cache_cleanup (Cache *cache);
 
