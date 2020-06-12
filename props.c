@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include <CoreFoundation/CFArray.h>
 #include <CoreFoundation/CFData.h>
 #include <CoreFoundation/CFDate.h>
@@ -41,6 +42,12 @@ typedef struct ArrAppContext {
     unsigned long count;
     ErrorCode ec;
 } ArrAppContext;
+
+typedef struct DateContext {
+    time_t *date;
+    char **errmsg;
+    unsigned long count;
+} DateContext;
 
 static const char *typeString (CFPropertyListRef plist) {
     const CFTypeID t = CFGetTypeID (plist);
@@ -76,6 +83,24 @@ static void addString (CFStringRef str, ArrayList *dest) {
     free (buf);
 }
 
+static char *copyString (CFStringRef str) {
+    size_t buflen = CFStringGetLength (str) * 4 + 1;
+    char *buf = malloc (buflen);
+    CHECK_NULL (buf);
+    if (CFStringGetCString (str, buf, buflen, kCFStringEncodingUTF8)) {
+        const size_t len = strlen (buf);
+        buf = realloc (buf, len + 1);
+        CHECK_NULL (buf);
+        return buf;
+    } else {
+        buf = realloc (buf, 4);
+        CHECK_NULL (buf);
+        memset (buf, '?', 3);
+        buf[3] = 0;
+        return buf;
+    }
+}
+
 static void arrApp (const void *value, void *context) {
     ArrAppContext *ctx = context;
     CFPropertyListRef plist = value;
@@ -100,6 +125,25 @@ static void arrApp (const void *value, void *context) {
     ctx->count++;
 }
 
+static void dateApp (const void *value, void *context) {
+    DateContext *ctx = context;
+    CFPropertyListRef plist = value;
+    const CFTypeID t = CFGetTypeID (plist);
+
+    if (t == CFDateGetTypeID()) {
+        const CFAbsoluteTime abt = CFDateGetAbsoluteTime (plist);
+        *(ctx->date) = (time_t) (abt - kCFAbsoluteTimeIntervalSince1970);
+    } else if (*(ctx->errmsg) == NULL) {
+        char buf[80];
+        snprintf (buf, sizeof (buf),
+                  "Array element %lu is %s, not CFDate",
+                  ctx->count, typeString (plist));
+        *(ctx->errmsg) = MY_STRDUP (buf);
+    }
+
+    ctx->count++;
+}
+
 static ErrorCode addArray (CFPropertyListRef plist, ArrayList *dest) {
     const CFTypeID t = CFGetTypeID (plist);
 
@@ -119,6 +163,29 @@ static ErrorCode addArray (CFPropertyListRef plist, ArrayList *dest) {
     const CFIndex count = CFArrayGetCount (plist);
     CFArrayApplyFunction (plist, CFRangeMake (0, count), arrApp, &ctx);
     return ctx.ec;
+}
+
+static ErrorCode dateArray (CFPropertyListRef plist,
+                            time_t *date,
+                            char **errmsg) {
+    const CFTypeID t = CFGetTypeID (plist);
+
+    if (t != CFArrayGetTypeID()) {
+        char buf[80];
+        snprintf (buf, sizeof (buf),
+                  "Property list is %s, not CFArray", typeString (plist));
+        *errmsg = MY_STRDUP (buf);
+        return EC_OTHER;
+    }
+
+    DateContext ctx;
+    ctx.date = date;
+    ctx.errmsg = errmsg;
+    ctx.count = 0;
+
+    const CFIndex count = CFArrayGetCount (plist);
+    CFArrayApplyFunction (plist, CFRangeMake (0, count), dateApp, &ctx);
+    return (*errmsg ? EC_OTHER : EC_OK);
 }
 
 ErrorCode props2list (const void *data, size_t length, ArrayList *dest) {
@@ -141,6 +208,36 @@ ErrorCode props2list (const void *data, size_t length, ArrayList *dest) {
     }
 
     const ErrorCode ec = addArray (plist, dest);
+    CFRelease (plist);
+    return ec;
+}
+
+ErrorCode props2time (const void *data,
+                      size_t length,
+                      time_t *date,
+                      char **errmsg) {
+    *date = 0;
+    *errmsg = NULL;
+
+    CFDataRef d = CFDataCreate (NULL, data, length);
+    CHECK_NULL (d);
+
+    CFErrorRef err = NULL;
+    CFPropertyListRef plist =
+        CFPropertyListCreateWithData (NULL, d, kCFPropertyListImmutable,
+                                      NULL, &err);
+    CFRelease (d);
+
+    if (plist == NULL) {
+        CFStringRef msg = CFErrorCopyDescription (err);
+        CHECK_NULL (msg);
+        *errmsg = copyString (msg);
+        CFRelease (msg);
+        CFRelease (err);
+        return EC_OTHER;
+    }
+
+    const ErrorCode ec = dateArray (plist, date, errmsg);
     CFRelease (plist);
     return ec;
 }

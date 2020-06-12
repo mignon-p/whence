@@ -117,6 +117,10 @@ void AL_cleanup (ArrayList *al);
 
 /* props.c */
 ErrorCode props2list (const void *data, size_t length, ArrayList *dest);
+ErrorCode props2time (const void *data,
+                      size_t length,
+                      time_t *date,
+                      char **errmsg);
 
 /* split.c */
 void split (const char *str, char sep, ArrayList *dest);
