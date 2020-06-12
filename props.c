@@ -132,7 +132,7 @@ static void dateApp (const void *value, void *context) {
 
     if (t == CFDateGetTypeID()) {
         const CFAbsoluteTime abt = CFDateGetAbsoluteTime (plist);
-        *(ctx->date) = (time_t) (abt - kCFAbsoluteTimeIntervalSince1970);
+        *(ctx->date) = (time_t) (abt + kCFAbsoluteTimeIntervalSince1970);
     } else if (*(ctx->errmsg) == NULL) {
         char buf[80];
         snprintf (buf, sizeof (buf),
