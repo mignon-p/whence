@@ -208,6 +208,29 @@ ErrorCode getAttributes (const char *fname,
     result = NULL;
 
     if (ec1 != EC_NOFILE) {
+        ErrorCode ec2 =
+            getAttribute (fname, "com.apple.metadata:kMDItemDownloadedDate",
+                          &result, &length);
+        if (ec2 == EC_OK) {
+            time_t date = 0;
+            char *errmsg = NULL;
+            ec2 = props2time (result, length, &date, &errmsg);
+            if (ec2 == EC_OK) {
+                dest->date = date;
+            } else if (dest->error == NULL) {
+                dest->error = errmsg;
+            } else {
+                free (errmsg);
+            }
+        }
+
+        ec1 = combineErrors (ec1, ec2);
+
+        free (result);
+        result = NULL;
+    }
+
+    if (ec1 != EC_NOFILE) {
         ErrorCode ec2 = getAttribute (fname, "com.apple.quarantine",
                                       &result, &length);
         if (ec2 == EC_OK) {
