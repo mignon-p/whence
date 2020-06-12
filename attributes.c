@@ -205,20 +205,16 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
         return;
     }
 
-    const char *date = NULL;
+    char *date = NULL;
 
     /* only MacOS records the date that the file was downloaded */
 #ifdef __APPLE__
-    const time_t t = attrs->date;
-    char buf[40];
-    if (t != 0) {
-        if (!is_json (style)) {
-            strftime (buf, sizeof (buf), "%+", localtime (&t));
+    if (attrs->date.secondsValid) {
+        if (is_json (style)) {
+            date = MyDate_format_iso8601 (&attrs->date);
         } else {
-            strftime (buf, sizeof (buf), "%Y-%m-%dT%H:%M:%SZ", gmtime (&t));
+            date = MyDate_format_human (&attrs->date);
         }
-
-        date = buf;
     }
 #endif
 
@@ -233,6 +229,8 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     PR("Zone", attrs->zone);
     PR("Error", attrs->error);
     p->print_end (lastFile);
+
+    free (date);
 }
 
 #undef PR

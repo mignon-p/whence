@@ -47,6 +47,13 @@ typedef struct ArrayList {
     size_t capacity;
 } ArrayList;
 
+typedef struct MyDate {
+    time_t seconds;
+    uint16_t milliseconds;
+    bool secondsValid;
+    bool millisValid;
+} MyDate;
+
 typedef struct Attributes {
     char *url;
     char *referrer;
@@ -54,7 +61,7 @@ typedef struct Attributes {
     char *subject;
     char *message_id;
     char *application;
-    time_t date;
+    MyDate date;
     char *zone;
     char *error;
 } Attributes;
@@ -119,7 +126,7 @@ void AL_cleanup (ArrayList *al);
 ErrorCode props2list (const void *data, size_t length, ArrayList *dest);
 ErrorCode props2time (const void *data,
                       size_t length,
-                      time_t *date,
+                      MyDate *date,
                       char **errmsg);
 
 /* split.c */
@@ -154,5 +161,12 @@ char *get_sqlite_version (void);
 
 /* registry.c */
 const char *getZoneName (const char *zoneNumber, ZoneCache *zc);
+
+/* date.c */
+void MyDate_clear (MyDate *date);
+void MyDate_set_integer (MyDate *date, time_t t);
+void MyDate_set_fractional (MyDate *date, double t);
+char *MyDate_format_human (const MyDate *date);
+char *MyDate_format_iso8601 (const MyDate *date);
 
 #endif  /* WHENCE_H */

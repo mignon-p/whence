@@ -44,7 +44,7 @@ typedef struct ArrAppContext {
 } ArrAppContext;
 
 typedef struct DateContext {
-    time_t *date;
+    MyDate *date;
     char **errmsg;
     unsigned long count;
 } DateContext;
@@ -132,7 +132,10 @@ static void dateApp (const void *value, void *context) {
 
     if (t == CFDateGetTypeID()) {
         const CFAbsoluteTime abt = CFDateGetAbsoluteTime (plist);
-        *(ctx->date) = (time_t) (abt + kCFAbsoluteTimeIntervalSince1970);
+        const CFTimeInterval t1970 = abt + kCFAbsoluteTimeIntervalSince1970;
+        if (! ctx->date->secondsValid) {
+            MyDate_set_fractional (ctx->date, t1970);
+        }
     } else if (*(ctx->errmsg) == NULL) {
         char buf[80];
         snprintf (buf, sizeof (buf),
@@ -166,7 +169,7 @@ static ErrorCode addArray (CFPropertyListRef plist, ArrayList *dest) {
 }
 
 static ErrorCode dateArray (CFPropertyListRef plist,
-                            time_t *date,
+                            MyDate *date,
                             char **errmsg) {
     const CFTypeID t = CFGetTypeID (plist);
 
@@ -214,11 +217,8 @@ ErrorCode props2list (const void *data, size_t length, ArrayList *dest) {
 
 ErrorCode props2time (const void *data,
                       size_t length,
-                      time_t *date,
+                      MyDate *date,
                       char **errmsg) {
-    *date = 0;
-    *errmsg = NULL;
-
     CFDataRef d = CFDataCreate (NULL, data, length);
     CHECK_NULL (d);
 
@@ -229,10 +229,12 @@ ErrorCode props2time (const void *data,
     CFRelease (d);
 
     if (plist == NULL) {
-        CFStringRef msg = CFErrorCopyDescription (err);
-        CHECK_NULL (msg);
-        *errmsg = copyString (msg);
-        CFRelease (msg);
+        if (*errmsg == NULL) {
+            CFStringRef msg = CFErrorCopyDescription (err);
+            CHECK_NULL (msg);
+            *errmsg = copyString (msg);
+            CFRelease (msg);
+        }
         CFRelease (err);
         return EC_OTHER;
     }

@@ -116,8 +116,8 @@ static ErrorCode parse_quarantine (Attributes *dest,
 
         AL_cleanup (&al);
         return EC_OTHER;
-    } else {
-        dest->date = (time_t) date;
+    } else if (! dest->date.secondsValid) {
+        MyDate_set_integer (&dest->date, (time_t) date);
     }
 
     if (dest->application == NULL) {
@@ -212,16 +212,10 @@ ErrorCode getAttributes (const char *fname,
             getAttribute (fname, "com.apple.metadata:kMDItemDownloadedDate",
                           &result, &length);
         if (ec2 == EC_OK) {
-            time_t date = 0;
-            char *errmsg = NULL;
-            ec2 = props2time (result, length, &date, &errmsg);
-            if (ec2 == EC_OK) {
-                dest->date = date;
-            } else if (dest->error == NULL) {
-                dest->error = errmsg;
-            } else {
-                free (errmsg);
-            }
+            ec2 = props2time (result, length, &dest->date, &dest->error);
+        } else if (ec2 != EC_NOATTR && dest->error == NULL) {
+            dest->error = result;   /* transfer ownership */
+            result = NULL;
         }
 
         ec1 = combineErrors (ec1, ec2);
