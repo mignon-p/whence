@@ -104,7 +104,7 @@ static bool is_option (const char *arg, const char *opt1, const char *opt2) {
     }
 }
 
-int main (int argc, char **argv) {
+static int utf8_main (int argc, char **argv) {
     bool json = false;
     int arg1 = 1;
 
@@ -191,3 +191,37 @@ int main (int argc, char **argv) {
     Cache_cleanup (&cache);
     return ec;
 }
+
+#ifdef _WIN32
+
+int wmain (int argc, wchar_t **argv) {
+    ArrayList al;
+
+    AL_init (&al);
+
+    int i;
+    for (i = 0; i < argc; i++) {
+        char *s8 = utf16to8 (argv[i]);
+        if (s8 == NULL) {
+            err_printf (CMD_NAME ": failed to convert argv[%d] to UTF-8", i);
+            AL_cleanup (&al);
+            return EC_CMDLINE;
+        } else {
+            AL_add_nocopy (&al, s8);
+        }
+    }
+
+    const int ret = utf8_main (argc, al.strings);
+    AL_cleanup (&al);
+
+    return ret;
+}
+
+#else  /* _WIN32 */
+
+/* assume we have a UTF-8 locale */
+int main (int argc, char **argv) {
+    return utf8_main (argc, argv);
+}
+
+#endif  /* _WIN32 */
