@@ -60,7 +60,7 @@ utf16 *utf8to16_len (const char *s, size_t len) {
 
     result[ret] = 0;            /* NUL terminate result */
     const size_t actual_code_units = ret + 1;
-    result = (utf16 *) realloc (2 * actual_code_units);
+    result = (utf16 *) realloc (result, 2 * actual_code_units);
     CHECK_NULL (result);
     return result;
 }
@@ -86,7 +86,7 @@ char *utf16to8_len (const utf16 *s, size_t len) {
 
     result[ret] = 0;            /* NUL terminate result */
     const size_t actual_bytes = ret + 1;
-    result = realloc (actual_bytes);
+    result = realloc (result, actual_bytes);
     CHECK_NULL (result);
     return result;
 }
