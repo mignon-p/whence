@@ -4,6 +4,7 @@ case `uname` in
     Darwin) exec clang -o whence \
 		 -framework CoreFoundation \
 		 -lsqlite3 \
+                 -liconv \
 		 -mmacosx-version-min=10.6 \
 		 -Wall -O3 *.c;;
     FreeBSD) exec clang -o whence -Wall -O3 *.c;;

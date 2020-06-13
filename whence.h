@@ -29,8 +29,18 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef _WIN32
+#include <wchar.h>
+#endif
+
 #define CMD_NAME "whence"
 #define CMD_VERSION "0.9.1"
+
+#ifdef _WIN32
+typedef wchar_t utf16;
+#else
+typedef uint16_t utf16;
+#endif
 
 typedef enum ErrorCode {
     EC_OK = 0,
@@ -168,5 +178,11 @@ void MyDate_set_integer (MyDate *date, time_t t);
 void MyDate_set_fractional (MyDate *date, double t);
 char *MyDate_format_human (const MyDate *date);
 char *MyDate_format_iso8601 (const MyDate *date);
+
+/* utf-iconv.c or utf-win32.c */
+utf16 *utf8to16 (const char *s);
+char *utf16to8 (const utf16 *s);
+utf16 *utf8to16_len (const char *s, size_t len);
+char *utf16to8_len (const utf16 *s, size_t len);
 
 #endif  /* WHENCE_H */
