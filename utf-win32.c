@@ -107,7 +107,7 @@ char *utf16to8_nofail (const utf16 *s) {
     char *ret = utf16to8 (s);
 
     if (ret == NULL) {
-        err_printf (CMD_NAME ": failed to convert UTF-16 to UTF-8", s);
+        err_printf (CMD_NAME ": failed to convert UTF-16 to UTF-8");
         exit (EC_OTHER);
     }
 

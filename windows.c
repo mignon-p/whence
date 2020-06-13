@@ -51,7 +51,7 @@ ErrorCode getAttribute (const char *fname,
 
     ErrorCode ec = EC_OK;
     utf16* wStreamName = utf8to16_nofail (streamName);
-    utf8* wfname = NULL;
+    utf16* wfname = NULL;
 
     FILE *f = _wfopen (wStreamName, L"r");
     if (!f) {
@@ -61,7 +61,7 @@ ErrorCode getAttribute (const char *fname,
 
         wfname = utf8to16_nofail (fname);
 
-        if (_access (wfname, 0) == 0) {
+        if (_waccess (wfname, 0) == 0) {
             ec = EC_NOATTR;     /* file exists but alternate stream does not */
             goto done;
         } else {
