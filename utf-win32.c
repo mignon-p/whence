@@ -30,6 +30,7 @@
 #include <Windows.h>
 #include <string.h>
 #include <wchar.h>
+#include <stdlib.h>
 
 utf16 *utf8to16 (const char *s) {
     return utf8to16_len (s, strlen (s));
@@ -89,6 +90,28 @@ char *utf16to8_len (const utf16 *s, size_t len) {
     result = realloc (result, actual_bytes);
     CHECK_NULL (result);
     return result;
+}
+
+utf16 *utf8to16_nofail (const char *s) {
+    utf16 *ret = utf8to16 (s);
+
+    if (ret == NULL) {
+        err_printf (CMD_NAME ": failed to convert '%s' to UTF-16", s);
+        exit (EC_OTHER);
+    }
+
+    return ret;
+}
+
+char *utf16to8_nofail (const utf16 *s) {
+    char *ret = utf16to8 (s);
+
+    if (ret == NULL) {
+        err_printf (CMD_NAME ": failed to convert UTF-16 to UTF-8", s);
+        exit (EC_OTHER);
+    }
+
+    return ret;
 }
 
 #endif  /* _WIN32 */

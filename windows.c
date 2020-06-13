@@ -50,14 +50,18 @@ ErrorCode getAttribute (const char *fname,
     AL_clear (&al);
 
     ErrorCode ec = EC_OK;
+    utf16* wStreamName = utf8to16_nofail (streamName);
+    utf8* wfname = NULL;
 
-    FILE *f = fopen (streamName, "r");
+    FILE *f = _wfopen (wStreamName, L"r");
     if (!f) {
         const int errnum = errno;
         *result = MY_STRDUP (strerror (errnum));
         *length = strlen (*result);
 
-        if (_access (fname, 0) == 0) {
+        wfname = utf8to16_nofail (fname);
+
+        if (_access (wfname, 0) == 0) {
             ec = EC_NOATTR;     /* file exists but alternate stream does not */
             goto done;
         } else {
@@ -98,6 +102,8 @@ ErrorCode getAttribute (const char *fname,
         fclose (f);
     }
 
+    free (wfname);
+    free (wStreamName);
     free (streamName);
     AL_cleanup (&al);
 

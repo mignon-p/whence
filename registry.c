@@ -37,21 +37,32 @@
 static char *get_reg (HKEY key, const char *subkey) {
     const char *value = "DisplayName";
     DWORD len = 0;
+    utf16 *wresult = NULL;
+    char *result = NULL;
 
-    LSTATUS st = RegGetValue (key, subkey, value,
+    utf16 *wsubkey = utf8to16_nofail (subkey);
+    utf16 *wvalue = utf8to16_nofail (value);
+
+    LSTATUS st = RegGetValue (key, wsubkey, wvalue,
                               RRF_RT_REG_SZ, NULL, NULL, &len);
     if (st != ERROR_SUCCESS || len == 0) {
-        return NULL;
+        goto done;
     }
 
-    char *result = malloc (len);
-    CHECK_NULL (result);
-    st = RegGetValue (key, subkey, value,
-                      RRF_RT_REG_SZ, NULL, result, &len);
+    wresult = malloc (len);
+    CHECK_NULL (wresult);
+    st = RegGetValue (key, wsubkey, wvalue,
+                      RRF_RT_REG_SZ, NULL, wresult, &len);
     if (st != ERROR_SUCCESS) {
-        free (result);
-        return NULL;
+        goto done;
     }
+
+    result = utf16to8_nofail (wresult);
+
+ done:
+    free (wresult);
+    free (wvalue);
+    free (wsubkey);
 
     return result;
 }

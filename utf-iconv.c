@@ -124,6 +124,8 @@ utf16 *utf8to16_len (const char *s, size_t len) {
  *   utf16 *utf8to16 (const char *s);
  *   char *utf16to8 (const utf16 *s);
  *   char *utf16to8_len (const utf16 *s, size_t len);
+ *   utf16 *utf8to16_nofail (const char *s);
+ *   char *utf16to8_nofail (const utf16 *s);
  */
 
 #endif  /* not _WIN32 */
