@@ -36,8 +36,24 @@ typedef enum Opened {
     Opened_Failed
 } Opened;
 
+typedef union TestEndian {
+    uint16_t u16;
+    uint8_t u8[2];
+} TestEndian;
+
 static iconv_t conv_handle;     /* for converting utf-8 to utf-16 */
 static Opened conv_opened = Opened_NotTried;
+
+static const char *utf16_name (void) {
+    TestEndian u;
+
+    u.u16 = 0x1234;
+    if (u.u8[0] == 0x34) {
+        return "UTF-16LE";
+    } else {
+        return "UTF-16BE";
+    }
+}
 
 static void close_conv (void) {
     iconv_close (conv_handle);
@@ -46,8 +62,8 @@ static void close_conv (void) {
 
 static bool open_conv (void) {
     if (conv_opened == Opened_NotTried) {
-        conv_handle = iconv_open ("utf-16", "utf-8");
-        /*                        ^to       ^from */
+        conv_handle = iconv_open (utf16_name(), "UTF-8");
+        /*                        ^to           ^from */
 
         if (conv_handle == (iconv_t)(-1)) {
             conv_opened = Opened_Failed;
