@@ -88,7 +88,6 @@ void err_printf (const char *format, ...) {
 
 size_t print_escaped_unicode (const char *s) {
     const char *p;
-    utf16 *pw;
 
     for (p = s; ((unsigned char) (*p)) >= 0x80; p++) {
         /* empty */
@@ -97,9 +96,24 @@ size_t print_escaped_unicode (const char *s) {
     const size_t len = p - s;
     utf16 *wide = utf8to16_len (s, len);
 
-    for (pw = wide; *pw != 0; pw++) {
-        const unsigned int c = *pw;
-        printf ("\\u%04X", c & 0xffff);
+    if (wide == NULL) {
+        /* If the conversion to UTF-16 fails (e. g. invalid UTF-8)
+         * then just print out the alleged UTF-8 as-is, and hope
+         * that's okay. */
+        size_t i;
+
+        for (i = 0; i < len; i++) {
+            putchar (s[i]);
+        }
+    } else {
+        utf16 *pw;
+
+        for (pw = wide; *pw != 0; pw++) {
+            const unsigned int c = *pw;
+            printf ("\\u%04X", c & 0xffff);
+        }
+
+        free (wide);
     }
 
     return len;
