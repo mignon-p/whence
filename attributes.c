@@ -92,12 +92,17 @@ static void print_string (const char *s, bool forceLC) {
             c = tolower (c);
         }
 
+        const unsigned char uc = (unsigned char) c;
+
         if (c == '"') {
             printf ("\\\"");
         } else if (c == '\\') {
             printf ("\\\\");
-        } else if (c < ' ') {
+        } else if (uc < 0x20 || uc == 0x7f) {
             printf ("\\u%04X", c);
+        } else if (uc >= 0x80) {
+            s--;
+            s += print_escaped_unicode (s);
         } else {
             putchar (c);
         }

@@ -85,3 +85,22 @@ void err_printf (const char *format, ...) {
     }
     fprintf (stderr, "\n");
 }
+
+size_t print_escaped_unicode (const char *s) {
+    const char *p;
+    utf16 *pw;
+
+    for (p = s; ((unsigned char) (*p)) >= 0x80; p++) {
+        /* empty */
+    }
+
+    const size_t len = p - s;
+    utf16 *wide = utf8to16_len (s, len);
+
+    for (pw = wide; *pw != 0; pw++) {
+        const unsigned int c = *pw;
+        printf ("\\u%04X", c & 0xffff);
+    }
+
+    return len;
+}

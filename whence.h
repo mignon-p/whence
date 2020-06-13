@@ -123,6 +123,7 @@ void err_printf (const char *fmt, ...)
     __attribute__ ((format (printf, 1, 2)))
 #endif
     ;
+size_t print_escaped_unicode (const char *s);
 
 /* array-list.c */
 void AL_init (ArrayList *al);
