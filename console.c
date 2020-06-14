@@ -39,7 +39,7 @@ static bool initialized = false;
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 4
 #endif
 
-struct RestoreMode {
+typedef struct RestoreMode {
     HANDLE h;
     DWORD mode;
     struct RestoreMode *next;
@@ -47,7 +47,7 @@ struct RestoreMode {
 
 static RestoreMode *oldModes = NULL;
 
-static void add_mode (Handle h, DWORD mode) {
+static void add_mode (HANDLE h, DWORD mode) {
     RestoreMode *r;
 
     for (r = oldModes; r != NULL; r = r->next) {
@@ -102,7 +102,7 @@ void detectConsole (void) {
         stderrIsConsole = save_mode (STDERR_FILENO);
 
         if (oldModes != NULL) {
-            atexit (restore_modes);
+            atexit (restore_mode);
         }
 
         initialized = true;
@@ -114,9 +114,9 @@ void writeUTF8 (FILE *f, const char *s) {
     bool useConsole;
 
     switch (fd) {
-    STDOUT_FILENO: useConsole = stdoutIsConsole; break;
-    STDERR_FILENO: useConsole = stderrIsConsole; break;
-    default:       useConsole = false;           break;
+    case STDOUT_FILENO: useConsole = stdoutIsConsole; break;
+    case STDERR_FILENO: useConsole = stderrIsConsole; break;
+    default:            useConsole = false;           break;
     }
 
     if (useConsole) {
