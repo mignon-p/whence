@@ -32,13 +32,25 @@
 
 #define TRUNCATION_LIMIT 1600
 
+typedef struct PrCtx {
+    bool empty;
+    bool colorize;
+    bool firstField;
+    bool lastFile;
+} PrCtx;
+
 typedef struct Printer {
-    void (*print_fname) (const char *fname, bool empty);
+    void (*print_fname) (const char *fname, PrCtx *ctx);
     void (*print_field) (const char *field,
                          const char *value,
-                         bool *firstField);
-    void (*print_end) (bool lastFile);
+                         PrCtx *ctx);
+    void (*print_end) (PrCtx *ctx);
 } Printer;
+
+static void PrCtx_init (PrCtx *ctx) {
+    memset (ctx, 0, sizeof (*ctx));
+    ctx->firstField = true;
+}
 
 static void print_limited (const char *s, bool color) {
     const size_t len = strlen (s);
@@ -53,33 +65,33 @@ static void print_limited (const char *s, bool color) {
     }
 }
 
-static void human_print_fname (const char *fname, bool empty) {
-    if (!empty) {
+static void human_print_fname (const char *fname, PrCtx *ctx) {
+    if (! ctx->empty) {
         printf ("%s:\n", fname);
     }
 }
 
 static void human_print_field (const char *field,
                                const char *value,
-                               bool *firstField) {
+                               PrCtx *ctx) {
     printf ("  %-11s ", field);
     print_limited (value, false);
 }
 
-static void human_print_fname_color (const char *fname, bool empty) {
-    if (!empty) {
+static void human_print_fname_color (const char *fname, PrCtx *ctx) {
+    if (! ctx->empty) {
         printf ("\e[95m%s\e[0m:\n", fname);
     }
 }
 
 static void human_print_field_color (const char *field,
                                      const char *value,
-                                     bool *firstField) {
+                                     PrCtx *ctx) {
     printf ("  \e[92m%-11s\e[0m ", field);
     print_limited (value, true);
 }
 
-static void human_print_end (bool lastFile) {
+static void human_print_end (PrCtx *ctx) {
     /* do nothing */
 }
 
@@ -111,7 +123,7 @@ static void print_string (const char *s, bool forceLC) {
     putchar ('"');
 }
 
-static void json_print_fname (const char *fname, bool empty) {
+static void json_print_fname (const char *fname, PrCtx *ctx) {
     printf ("  ");
     print_string (fname, false);
     printf (": {");
@@ -119,9 +131,9 @@ static void json_print_fname (const char *fname, bool empty) {
 
 static void json_print_field (const char *field,
                               const char *value,
-                              bool *firstField) {
-    if (*firstField == true) {
-        *firstField = false;
+                              PrCtx *ctx) {
+    if (ctx->firstField == true) {
+        ctx->firstField = false;
     } else {
         printf (",");
     }
@@ -132,9 +144,9 @@ static void json_print_field (const char *field,
     print_string (value, false);
 }
 
-static void json_print_end (bool lastFile) {
+static void json_print_end (PrCtx *ctx) {
     printf ("\n  }");
-    if (lastFile) {
+    if (ctx->lastFile) {
         printf ("\n");
     } else {
         printf (",\n");
@@ -198,12 +210,15 @@ void Attr_init (Attributes *attrs) {
 }
 
 #define PR(field, value) \
-    if (value) p->print_field (field, value, &firstField)
+    if (value) p->print_field (field, value, &ctx)
 
 void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     const Printer *p = get_printer (style);
     const bool lastFile = (style == AS_JSON_LAST);
-    bool firstField = true;
+
+    PrCtx ctx;
+    PrCtx_init (&ctx);
+    ctx.lastFile = lastFile;
 
     if (attrs->error != NULL && !is_json (style)) {
         err_printf ("%s: %s", fname, attrs->error);
@@ -223,7 +238,9 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     }
 #endif
 
-    p->print_fname (fname, isEmpty (attrs));
+    ctx.empty = isEmpty (attrs);
+
+    p->print_fname (fname, &ctx);
     PR("URL", attrs->url);
     PR("Referrer", attrs->referrer);
     PR("From", attrs->from);
@@ -233,7 +250,7 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
     PR("Date", date);
     PR("Zone", attrs->zone);
     PR("Error", attrs->error);
-    p->print_end (lastFile);
+    p->print_end (&ctx);
 
     free (date);
 }
