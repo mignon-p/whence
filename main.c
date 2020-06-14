@@ -179,8 +179,11 @@ static int utf8_main (int argc, char **argv) {
     }
 
     if (ec == EC_NOATTR && !json) {
-        err_printf ("%s: No attributes found",
-                    (nFiles == 1 ? argv[argc - 1] : CMD_NAME));
+        setColor (stderr, stderrIsConsole, COLOR_RED);
+        writeUTF8 (stderr, (nFiles == 1 ? argv[argc - 1] : CMD_NAME));
+        fprintf (stderr, ": No attributes found");
+        setColor (stderr, stderrIsConsole, COLOR_OFF);
+        fprintf (stderr, "\n");
     }
 
     Cache_cleanup (&cache);
