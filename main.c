@@ -123,11 +123,8 @@ static int utf8_main (int argc, char **argv) {
         return EC_OK;
     }
 
-    const bool colorize = (!json &&
-                           isatty (STDOUT_FILENO) &&
-                           enableColorEscapes (STDOUT_FILENO));
-    colorize_errors =
-        isatty (STDERR_FILENO) && enableColorEscapes (STDERR_FILENO);
+    const bool isConsole = detectConsole (stdout);
+    const bool colorize = isConsole && !json;
 
 #ifdef __APPLE__                /* we only format time on MacOS */
     if (!json && NULL == setlocale (LC_TIME, "")) {
@@ -198,6 +195,7 @@ int wmain (int argc, wchar_t **argv) {
     ArrayList al;
 
     AL_init (&al);
+    colorize_errors = detectConsole (stderr);
 
     int i;
     for (i = 0; i < argc; i++) {
@@ -221,6 +219,7 @@ int wmain (int argc, wchar_t **argv) {
 
 /* assume we have a UTF-8 locale */
 int main (int argc, char **argv) {
+    colorize_errors = detectConsole (stderr);
     return utf8_main (argc, argv);
 }
 

@@ -28,6 +28,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef _WIN32
 #include <wchar.h>
@@ -161,8 +162,9 @@ ErrorCode getAttributes_xdg (const char *fname,
 void Cache_init (Cache *cache);
 void Cache_cleanup (Cache *cache);
 
-/* color.c */
-bool enableColorEscapes (int fd);
+/* console.c */
+bool detectConsole (FILE *f);
+void writeUTF8 (FILE *f, const char *s);
 
 /* database.c */
 ErrorCode lookup_uuid (Attributes *dest,

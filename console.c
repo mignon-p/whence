@@ -51,8 +51,14 @@ static void restore_mode (void) {
     }
 }
 
-bool enableColorEscapes (int fd) {
+bool detectConsole (FILE *f) {
+    const int fd = fileno (f);
+
     if (fd >= NUM_STD_FDS) {
+        return false;
+    }
+
+    if (! isatty(fd)) {
         return false;
     }
 
@@ -85,10 +91,49 @@ bool enableColorEscapes (int fd) {
     return SetConsoleMode (h, m | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 }
 
+void writeUTF8 (FILE *f, const char *s) {
+    const int fd = fileno (f);
+
+    if (fd < NUM_STD_FDS && consoleHandles[fd] != INVALID_HANDLE_VALUE) {
+        const HANDLE h = consoleHandles[fd];
+        utf16 *wide = utf8to16 (s);
+        if (wide == NULL) {
+            goto narrow;
+        }
+
+        fflush (f);
+
+        size_t len = wcslen (wide);
+        utf16 *w = wide;
+
+        while (len > 0) {
+            DWORD written = 0;
+            if (! WriteConsoleW (h, w, len, &written, NULL)) {
+                break;
+            }
+
+            len -= written;
+            w += written;
+        }
+
+        free (wide);
+    } else {
+    narrow:
+        fputs (s, f);
+    }
+}
+
 #else  /* _WIN32 */
 
-bool enableColorEscapes (int fd) {
-    return true;
+#include <unistd.h>
+#include <stdio.h>
+
+bool detectConsole (FILE *f) {
+    return isatty (fileno (f));
+}
+
+void writeUTF8 (FILE *f, const char *s) {
+    fputs (s, f);
 }
 
 #endif  /* _WIN32 */
