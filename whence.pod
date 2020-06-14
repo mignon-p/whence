@@ -119,27 +119,27 @@ Error message if there was a problem processing the file.
 
 =over
 
-=item 0
+=item exit code 0
 
 Attributes were found on at least one I<FILE> given on the command line.
 
-=item 1
+=item exit code 1
 
 Attributes were not found on any I<FILE> given on the command line.
 
-=item 2
+=item exit code 2
 
 At least one I<FILE> was not found.
 
-=item 3
+=item exit code 3
 
 Some other error occurred.
 
-=item 4
+=item exit code 4
 
 Command line parsing error.
 
-=item 5
+=item exit code 5
 
 Out of memory.
 

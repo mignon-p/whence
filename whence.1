@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "WHENCE 1"
-.TH WHENCE 1 "2020-06-08" "whence 0.9" "General Commands Manual"
+.TH WHENCE 1 "2020-06-14" "whence 0.9.1" "General Commands Manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -224,22 +224,23 @@ The security zone that the file was downloaded from.  (Windows only)
 Error message if there was a problem processing the file.
 .SH "EXIT STATUS"
 .IX Header "EXIT STATUS"
-.IP "0" 4
+.IP "exit code 0" 4
+.IX Item "exit code 0"
 Attributes were found on at least one \fI\s-1FILE\s0\fR given on the command line.
-.IP "1" 4
-.IX Item "1"
+.IP "exit code 1" 4
+.IX Item "exit code 1"
 Attributes were not found on any \fI\s-1FILE\s0\fR given on the command line.
-.IP "2" 4
-.IX Item "2"
+.IP "exit code 2" 4
+.IX Item "exit code 2"
 At least one \fI\s-1FILE\s0\fR was not found.
-.IP "3" 4
-.IX Item "3"
+.IP "exit code 3" 4
+.IX Item "exit code 3"
 Some other error occurred.
-.IP "4" 4
-.IX Item "4"
+.IP "exit code 4" 4
+.IX Item "exit code 4"
 Command line parsing error.
-.IP "5" 4
-.IX Item "5"
+.IP "exit code 5" 4
+.IX Item "exit code 5"
 Out of memory.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
