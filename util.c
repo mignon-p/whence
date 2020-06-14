@@ -28,8 +28,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-bool colorize_errors = false;
-
 static const char *my_basename (const char *file) {
     const char *slash = strrchr (file, '/');
     if (slash) {
@@ -74,13 +72,13 @@ char *my_strdup (const char *s, const char *file, long line) {
 
 void err_printf (const char *format, ...) {
     va_list va;
-    if (colorize_errors) {
+    if (stderrIsConsole) {
         fprintf (stderr, "\e[91m");
     }
     va_start (va, format);
     vfprintf (stderr, format, va);
     va_end (va);
-    if (colorize_errors) {
+    if (stderrIsConsole) {
         fprintf (stderr, "\e[0m");
     }
     fprintf (stderr, "\n");

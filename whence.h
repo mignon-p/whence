@@ -115,7 +115,6 @@ ErrorCode getAttribute (const char *fname,
 char *fixFilename (const char *fname, int32_t *drives);
 
 /* util.c */
-extern bool colorize_errors;
 void oom (const char *file, long line);
 ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2);
 char *my_strdup (const char *s, const char *file, long line);
@@ -163,7 +162,9 @@ void Cache_init (Cache *cache);
 void Cache_cleanup (Cache *cache);
 
 /* console.c */
-bool detectConsole (FILE *f);
+extern bool stdoutIsConsole;
+extern bool stderrIsConsole;
+void detectConsole (void);
 void writeUTF8 (FILE *f, const char *s);
 
 /* database.c */

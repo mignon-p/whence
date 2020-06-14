@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <unistd.h>
 #include <locale.h>
 #include <errno.h>
 
@@ -123,8 +122,7 @@ static int utf8_main (int argc, char **argv) {
         return EC_OK;
     }
 
-    const bool isConsole = detectConsole (stdout);
-    const bool colorize = isConsole && !json;
+    const bool colorize = stdoutIsConsole && !json;
 
 #ifdef __APPLE__                /* we only format time on MacOS */
     if (!json && NULL == setlocale (LC_TIME, "")) {
@@ -192,10 +190,10 @@ static int utf8_main (int argc, char **argv) {
 #ifdef _WIN32
 
 int wmain (int argc, wchar_t **argv) {
-    ArrayList al;
+    detectConsole ();
 
+    ArrayList al;
     AL_init (&al);
-    colorize_errors = detectConsole (stderr);
 
     int i;
     for (i = 0; i < argc; i++) {
@@ -219,7 +217,7 @@ int wmain (int argc, wchar_t **argv) {
 
 /* assume we have a UTF-8 locale */
 int main (int argc, char **argv) {
-    colorize_errors = detectConsole (stderr);
+    detectConsole ();
     return utf8_main (argc, argv);
 }
 

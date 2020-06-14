@@ -23,47 +23,59 @@
 
 #include "whence.h"
 
+bool stdoutIsConsole = false;
+bool stderrIsConsole = false;
+static bool initialized = false;
+
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
 
 #include <Windows.h>
 #include <io.h>
+#include <stdlib.h>
 
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 4
 #endif
 
-static HANDLE consoleHandles[] =
-    { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
-#define NUM_STD_FDS (sizeof (consoleHandles) / sizeof (consoleHandles[0]))
-static DWORD oldModes[NUM_STD_FDS];
+struct RestoreMode {
+    HANDLE h;
+    DWORD mode;
+    struct RestoreMode *next;
+} RestoreMode;
 
-static bool needAtExit = true;
+static RestoreMode *oldModes = NULL;
+
+static void add_mode (Handle h, DWORD mode) {
+    RestoreMode *r;
+
+    for (r = oldModes; r != NULL; r = r->next) {
+        if (r->h == h) {
+            return;             /* already saved mode for this handle */
+        }
+    }
+
+    r = malloc (sizeof (*r));
+    CHECK_NULL (r);
+    r->h = h;
+    r->mode = mode;
+    r->next = oldModes;
+    oldModes = r;
+}
 
 static void restore_mode (void) {
-    size_t i;
-
-    for (i = 0; i < NUM_STD_FDS; i++) {
-        if (consoleHandles[i] != INVALID_HANDLE_VALUE) {
-            SetConsoleMode (consoleHandles[i], oldModes[i]);
-        }
+    while (oldModes != NULL) {
+        SetConsoleMode (oldModes->h, oldModes->mode);
+        RestoreMode *next = oldModes->next;
+        free (oldModes);
+        oldModes = next;
     }
 }
 
-bool detectConsole (FILE *f) {
-    const int fd = fileno (f);
-
-    if (fd >= NUM_STD_FDS) {
-        return false;
-    }
-
+static bool save_mode (int fd) {
     if (! isatty(fd)) {
         return false;
-    }
-
-    if (consoleHandles[fd] != INVALID_HANDLE_VALUE) {
-        return true;            /* already called on this fd */
     }
 
     const HANDLE h = (HANDLE) _get_osfhandle (fd);
@@ -80,22 +92,39 @@ bool detectConsole (FILE *f) {
         return true;            /* already enabled */
     }
 
-    consoleHandles[fd] = h;
-    oldModes[fd] = m;
-    if (needAtExit && 0 != atexit (restore_mode)) {
-        return false;
-    }
-
-    needAtExit = false;
-
+    add_mode (h, m);
     return SetConsoleMode (h, m | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+}
+
+void detectConsole (void) {
+    if (! initialized) {
+        stdoutIsConsole = save_mode (STDOUT_FILENO);
+        stderrIsConsole = save_mode (STDERR_FILENO);
+
+        if (oldModes != NULL) {
+            atexit (restore_modes);
+        }
+
+        initialized = true;
+    }
 }
 
 void writeUTF8 (FILE *f, const char *s) {
     const int fd = fileno (f);
+    bool useConsole;
 
-    if (fd < NUM_STD_FDS && consoleHandles[fd] != INVALID_HANDLE_VALUE) {
-        const HANDLE h = consoleHandles[fd];
+    switch (fd) {
+    STDOUT_FILENO: useConsole = stdoutIsConsole; break;
+    STDERR_FILENO: useConsole = stderrIsConsole; break;
+    default:       useConsole = false;           break;
+    }
+
+    if (useConsole) {
+        const HANDLE h = (HANDLE) _get_osfhandle (fd);
+        if (h == INVALID_HANDLE_VALUE) {
+            goto narrow;
+        }
+
         utf16 *wide = utf8to16 (s);
         if (wide == NULL) {
             goto narrow;
@@ -109,7 +138,12 @@ void writeUTF8 (FILE *f, const char *s) {
         while (len > 0) {
             DWORD written = 0;
             if (! WriteConsoleW (h, w, len, &written, NULL)) {
-                break;
+                if (w == wide) {
+                    free (wide);
+                    goto narrow;
+                } else {
+                    break;
+                }
             }
 
             len -= written;
@@ -126,10 +160,15 @@ void writeUTF8 (FILE *f, const char *s) {
 #else  /* _WIN32 */
 
 #include <unistd.h>
-#include <stdio.h>
+#include <errno.h>
 
-bool detectConsole (FILE *f) {
-    return isatty (fileno (f));
+void detectConsole (void) {
+    if (!initialized) {
+        stdoutIsConsole = isatty (STDOUT_FILENO);
+        stderrIsConsole = isatty (STDERR_FILENO);
+        errno = 0;
+        initialized = true;
+    }
 }
 
 void writeUTF8 (FILE *f, const char *s) {
