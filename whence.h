@@ -188,4 +188,7 @@ char *utf16to8_len (const utf16 *s, size_t len);
 utf16 *utf8to16_nofail (const char *s);
 char *utf16to8_nofail (const utf16 *s);
 
+/* win-err.c */
+char *getErrorString (uint32_t lastErr);
+
 #endif  /* WHENCE_H */

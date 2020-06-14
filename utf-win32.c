@@ -32,6 +32,13 @@
 #include <wchar.h>
 #include <stdlib.h>
 
+static char *lastErrMsg = NULL;
+
+static void setLastMsg (char *newMsg) {
+    free (lastErrMsg);
+    lastErrMsg = newMsg;
+}
+
 utf16 *utf8to16 (const char *s) {
     return utf8to16_len (s, strlen (s));
 }
@@ -54,8 +61,18 @@ utf16 *utf8to16_len (const char *s, size_t len) {
     const int ret =
         MultiByteToWideChar (CP_UTF8, 0, s, len, result, result_code_units);
 
-    if (ret <= 0 || ret >= result_code_units - 1) {
+    if (ret <= 0) {
+        setLastMsg (getErrorString (GetLastError ()));
         free (result);
+        return NULL;
+    }
+
+    if (ret >= result_code_units - 1) {
+        char buf[80];
+        snprintf (buf, sizeof (buf), "%d >= %u",
+                  ret, (int)(result_code_units - 1));
+        free (result);
+        setLastMsg (MY_STRDUP (buf));
         return NULL;
     }
 
@@ -80,8 +97,18 @@ char *utf16to8_len (const utf16 *s, size_t len) {
     const int ret = WideCharToMultiByte (CP_UTF8, 0, s, len,
                                          result, result_bytes, NULL, NULL);
 
-    if (ret <= 0 || ret >= result_bytes - 1) {
+    if (ret <= 0) {
+        setLastMsg (getErrorString (GetLastError ()));
         free (result);
+        return NULL;
+    }
+
+    if (ret >= result_bytes - 1) {
+        char buf[80];
+        snprintf (buf, sizeof (buf), "%d >= %u",
+                  ret, (int)(result_bytes - 1));
+        free (result);
+        setLastMsg (MY_STRDUP (buf));
         return NULL;
     }
 
@@ -96,7 +123,8 @@ utf16 *utf8to16_nofail (const char *s) {
     utf16 *ret = utf8to16 (s);
 
     if (ret == NULL) {
-        err_printf (CMD_NAME ": failed to convert '%s' to UTF-16", s);
+        err_printf (CMD_NAME ": failed to convert '%s' to UTF-16: %s",
+                    s, lastErrMsg);
         exit (EC_OTHER);
     }
 
@@ -107,7 +135,8 @@ char *utf16to8_nofail (const utf16 *s) {
     char *ret = utf16to8 (s);
 
     if (ret == NULL) {
-        err_printf (CMD_NAME ": failed to convert UTF-16 to UTF-8");
+        err_printf (CMD_NAME ": failed to convert UTF-16 to UTF-8: %s",
+                    lastErrMsg);
         exit (EC_OTHER);
     }
 
