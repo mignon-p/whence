@@ -56,7 +56,7 @@ utf16 *utf8to16_len (const char *s, size_t len) {
         return result;
     }
 
-    const size_t result_code_units = len + 1;
+    const size_t result_code_units = len + 2;
     utf16 *result = (utf16 *) malloc (2 * result_code_units);
     CHECK_NULL (result);
     const int ret =
@@ -92,7 +92,7 @@ char *utf16to8_len (const utf16 *s, size_t len) {
         return result;
     }
 
-    const size_t result_bytes = len * 3 + 1;
+    const size_t result_bytes = len * 3 + 2;
     char *result = malloc (result_bytes);
     CHECK_NULL (result);
     const int ret = WideCharToMultiByte (CP_UTF8, 0, s, len,
