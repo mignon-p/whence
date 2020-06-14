@@ -71,16 +71,14 @@ char *my_strdup (const char *s, const char *file, long line) {
 }
 
 void err_printf (const char *format, ...) {
+    setColor (stderr, stderrIsConsole, COLOR_RED);
+
     va_list va;
-    if (stderrIsConsole) {
-        fprintf (stderr, "\e[91m");
-    }
     va_start (va, format);
     vfprintf (stderr, format, va);
     va_end (va);
-    if (stderrIsConsole) {
-        fprintf (stderr, "\e[0m");
-    }
+
+    setColor (stderr, stderrIsConsole, COLOR_OFF);
     fprintf (stderr, "\n");
 }
 
@@ -115,4 +113,10 @@ size_t print_escaped_unicode (const char *s) {
     }
 
     return len;
+}
+
+void setColor (FILE *f, bool useColor, int color) {
+    if (useColor) {
+        fprintf (f, "\e[%dm", color);
+    }
 }

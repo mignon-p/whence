@@ -43,6 +43,11 @@ typedef wchar_t utf16;
 typedef uint16_t utf16;
 #endif
 
+#define COLOR_RED     91
+#define COLOR_GREEN   92
+#define COLOR_MAGENTA 95
+#define COLOR_OFF      0
+
 typedef enum ErrorCode {
     EC_OK = 0,
     EC_NOATTR = 1,
@@ -124,6 +129,7 @@ void err_printf (const char *fmt, ...)
 #endif
     ;
 size_t print_escaped_unicode (const char *s);
+void setColor (FILE *f, bool useColor, int color);
 
 /* array-list.c */
 void AL_init (ArrayList *al);
