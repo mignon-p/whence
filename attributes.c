@@ -52,43 +52,42 @@ static void PrCtx_init (PrCtx *ctx) {
     ctx->firstField = true;
 }
 
-static void print_limited (const char *s, bool color) {
+static void print_limited (const char *s, bool useColor) {
     const size_t len = strlen (s);
+
     if (len <= TRUNCATION_LIMIT) {
-        printf ("%s\n", s);
+        writeUTF8 (stdout, s);
+        printf ("\n");
     } else {
-        const int limit = TRUNCATION_LIMIT;
-        const char *color_on = (color ? "\e[91m": "");
-        const char *color_off = (color ? "\e[0m": "");
-        printf ("%.*s%s... (%lu bytes)%s\n",
-                limit, s, color_on, (unsigned long) len, color_off);
+        char buf[TRUNCATION_LIMIT + 1];
+
+        memcpy (buf, s, TRUNCATION_LIMIT);
+        buf[TRUNCATION_LIMIT] = 0;
+
+        writeUTF8 (stdout, buf);
+        setColor (stdout, useColor, COLOR_RED);
+        printf ("... (%lu bytes)", (unsigned long) len);
+        setColor (stdout, useColor, COLOR_OFF);
+        printf ("\n");
     }
 }
 
 static void human_print_fname (const char *fname, PrCtx *ctx) {
     if (! ctx->empty) {
-        printf ("%s:\n", fname);
+        setColor (stdout, ctx->colorize, COLOR_MAGENTA);
+        writeUTF8 (stdout, fname);
+        setColor (stdout, ctx->colorize, COLOR_OFF);
+        printf (":\n");
     }
 }
 
 static void human_print_field (const char *field,
                                const char *value,
                                PrCtx *ctx) {
+    setColor (stdout, ctx->colorize, COLOR_GREEN);
     printf ("  %-11s ", field);
-    print_limited (value, false);
-}
-
-static void human_print_fname_color (const char *fname, PrCtx *ctx) {
-    if (! ctx->empty) {
-        printf ("\e[95m%s\e[0m:\n", fname);
-    }
-}
-
-static void human_print_field_color (const char *field,
-                                     const char *value,
-                                     PrCtx *ctx) {
-    printf ("  \e[92m%-11s\e[0m ", field);
-    print_limited (value, true);
+    setColor (stdout, ctx->colorize, COLOR_OFF);
+    print_limited (value, ctx->colorize);
 }
 
 static void human_print_end (PrCtx *ctx) {
@@ -159,12 +158,6 @@ static const Printer printer_human = {
     human_print_end
 };
 
-static const Printer printer_human_color = {
-    human_print_fname_color,
-    human_print_field_color,
-    human_print_end
-};
-
 static const Printer printer_json = {
     json_print_fname,
     json_print_field,
@@ -174,9 +167,8 @@ static const Printer printer_json = {
 static const Printer *get_printer (AttrStyle style) {
     switch (style) {
     case AS_HUMAN:
-        return &printer_human;
     case AS_HUMAN_COLOR:
-        return &printer_human_color;
+        return &printer_human;
     default:
         return &printer_json;
     }
@@ -239,6 +231,7 @@ void Attr_print (const Attributes *attrs, const char *fname, AttrStyle style) {
 #endif
 
     ctx.empty = isEmpty (attrs);
+    ctx.colorize = (style == AS_HUMAN_COLOR);
 
     p->print_fname (fname, &ctx);
     PR("URL", attrs->url);
