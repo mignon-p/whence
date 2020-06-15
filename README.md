@@ -106,6 +106,20 @@ The `ZoneId` number is mapped to a name by looking in
 
 `whence` is distributed under the terms of the [MIT License][7].
 
+## Change Log
+
+### 0.9.1 (unreleased)
+
+* Support XDG attributes on MacOS.
+* Support `com.apple.metadata:kMDItemDownloadedDate` on MacOS.
+* Generate correct Unicode escapes in JSON strings.
+* Support Unicode filenames on Windows.
+* Added `install-whence.sh` script for convenience on UNIX.
+
+### 0.9
+
+* Initial release.
+
 [1]: https://en.wikipedia.org/wiki/Extended_file_attributes
 [2]: https://www.freedesktop.org/wiki/CommonExtendedAttributes/
 [3]: https://eclecticlight.co/2017/12/11/xattr-com-apple-quarantine-the-quarantine-flag/
