@@ -192,31 +192,8 @@ static bool haveDrive (char drive, int32_t *drives) {
     return (((*drives >> n) & 1) != 0);
 }
 
-/* Problem #1:
- *
- * So, I've noticed a weird problem I don't really understand.
- * Normally, on Windows, absolute filenames get passed like this:
- *   C:/foo/bar/User Guide.pdf
- *
- * However, if the filename contains the single quote character "'",
- * it instead gets passed like this:
- *   /c/foo/bar/User's Guide.pdf
- *
- * fopen() knows how to open the "C:/" form, but doesn't seem to be
- * able to open the "/c/" form.
- *
- * This function rewrites "/c/" to "C:/", only if:
- *   - The original filename is not accessible
- *   - The drive letter exists
- *   - The file is accessible under the new name
- *
- * Problem #2:
- *
- * If filename is a single letter, such as "c", then when we append
- * the stream name, it looks like "c:Zone.Identifier", which would be
- * interpreted as a file "Zone.Identifier" in the current directory of
- * drive C.  Therefore, in the case of single letter filenames, prepend
- * "./" so it doesn't look like a drive letter.
+/* See comment about fixFilename() in whence.h for a description
+ * of the two problems that this function fixes.
  */
 char *fixFilename (const char *fname, int32_t *drives) {
     char *s = MY_STRDUP (fname);
