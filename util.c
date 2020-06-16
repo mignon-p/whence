@@ -71,14 +71,14 @@ char *my_strdup (const char *s, const char *file, long line) {
 }
 
 void err_printf (const char *format, ...) {
-    setColor (stderr, stderrIsConsole, COLOR_RED);
+    setColor (stderr, stderrTerminal.supports_color, COLOR_RED);
 
     va_list va;
     va_start (va, format);
     vfprintf (stderr, format, va);
     va_end (va);
 
-    setColor (stderr, stderrIsConsole, COLOR_OFF);
+    setColor (stderr, stderrTerminal.supports_color, COLOR_OFF);
     fprintf (stderr, "\n");
 }
 

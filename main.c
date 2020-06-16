@@ -122,7 +122,7 @@ static int utf8_main (int argc, char **argv) {
         return EC_OK;
     }
 
-    const bool colorize = stdoutIsConsole && !json;
+    const bool colorize = stdoutTerminal.supports_color && !json;
 
 #ifdef __APPLE__                /* we only format time on MacOS */
     if (!json && NULL == setlocale (LC_TIME, "")) {
@@ -179,10 +179,10 @@ static int utf8_main (int argc, char **argv) {
     }
 
     if (ec == EC_NOATTR && !json) {
-        setColor (stderr, stderrIsConsole, COLOR_RED);
+        setColor (stderr, stderrTerminal.supports_color, COLOR_RED);
         writeUTF8 (stderr, (nFiles == 1 ? argv[argc - 1] : CMD_NAME));
         fprintf (stderr, ": No attributes found");
-        setColor (stderr, stderrIsConsole, COLOR_OFF);
+        setColor (stderr, stderrTerminal.supports_color, COLOR_OFF);
         fprintf (stderr, "\n");
     }
 

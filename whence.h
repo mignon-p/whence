@@ -151,6 +151,13 @@ typedef ZoneCache Cache;
 typedef int Cache;              /* dummy */
 #endif
 
+/* Information about whether a file handle is a terminal.
+ */
+typedef struct Terminal {
+    bool is_terminal;
+    bool supports_color;
+} Terminal;
+
 /* Use after every malloc to die instantly if NULL is returned. */
 #define CHECK_NULL(x)                                           \
     do { if ((x) == NULL) oom (__FILE__, __LINE__); } while (0)
@@ -237,11 +244,11 @@ ErrorCode combineErrors (ErrorCode ec1, ErrorCode ec2);
  */
 char *my_strdup (const char *s, const char *file, long line);
 
-/* Format the given arguments, printf-style, and print them to
- * stderr.  If stderrIsConsole is true, send ANSI escapes so that
- * the message is printed in red.  err_printf() prints a newline
- * after printing the message, so the message itself should not
- * end with a newline.
+/* Format the given arguments, printf-style, and print them to stderr.
+ * If stderrTerminal.supports_color is true, send ANSI escapes so that
+ * the message is printed in red.  err_printf() prints a newline after
+ * printing the message, so the message itself should not end with a
+ * newline.
  */
 void err_printf (const char *fmt, ...)
 #ifdef __GNUC__
@@ -381,15 +388,13 @@ void Cache_cleanup (Cache *cache);
 
 /* console.c ------------------------------------------------------------- */
 
-/* True if stdout is a terminal (UNIX) or console (Windows), after
- * detectConsole() has been called. */
-extern bool stdoutIsConsole;
+/* Information about whether stdout is a terminal. */
+extern Terminal stdoutTerminal;
 
-/* True if stderr is a terminal (UNIX) or console (Windows), after
- * detectConsole() has been called. */
-extern bool stderrIsConsole;
+/* Information about whether stderr is a terminal. */
+extern Terminal stderrTerminal;
 
-/* Sets the stdoutIsConsole and stderrIsConsole variables.  On Windows,
+/* Sets the stdoutTerminal and stderrTerminal variables.  On Windows,
  * if a console is detected, sets the ENABLE_VIRTUAL_TERMINAL_PROCESSING
  * flag on the console, so that ANSI color escapes will be processed.
  * Uses atexit() to arrange for the original console mode to be restored

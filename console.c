@@ -23,8 +23,8 @@
 
 #include "whence.h"
 
-bool stdoutIsConsole = false;
-bool stderrIsConsole = false;
+Terminal stdoutTerminal;
+Terminal stderrTerminal;
 static bool initialized = false;
 
 #ifdef _WIN32
@@ -73,33 +73,47 @@ static void restore_mode (void) {
     }
 }
 
-static bool save_mode (int fd) {
+static bool save_mode (int fd, Terminal *t) {
     if (! isatty(fd)) {
-        return false;
+        t->is_terminal = false;
+        t->supports_color = false;
+        return;
     }
 
     const HANDLE h = (HANDLE) _get_osfhandle (fd);
     if (h == INVALID_HANDLE_VALUE) {
-        return false;
+        t->is_terminal = false;
+        t->supports_color = false;
+        return;
     }
 
     DWORD m = 0;
     if (! GetConsoleMode (h, &m)) {
-        return false;
+        t->is_terminal = false;
+        t->supports_color = false;
+        return;
     }
+
+    t->is_terminal = true;
 
     if (0 != (m & ENABLE_VIRTUAL_TERMINAL_PROCESSING)) {
-        return true;            /* already enabled */
+        t->supports_color = true; /* already enabled */
+        return;
     }
 
-    add_mode (h, m);
-    return SetConsoleMode (h, m | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+    const bool changedMode =
+        SetConsoleMode (h, m | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+    t->supports_color = changedMode;
+
+    if (changedMode) {
+        add_mode (h, m);
+    }
 }
 
 void detectConsole (void) {
     if (! initialized) {
-        stdoutIsConsole = save_mode (STDOUT_FILENO);
-        stderrIsConsole = save_mode (STDERR_FILENO);
+        save_mode (STDOUT_FILENO, &stdoutTerminal);
+        save_mode (STDERR_FILENO, &stderrTerminal);
 
         if (oldModes != NULL) {
             atexit (restore_mode);
@@ -114,9 +128,9 @@ void writeUTF8 (FILE *f, const char *s) {
     bool useConsole;
 
     switch (fd) {
-    case STDOUT_FILENO: useConsole = stdoutIsConsole; break;
-    case STDERR_FILENO: useConsole = stderrIsConsole; break;
-    default:            useConsole = false;           break;
+    case STDOUT_FILENO: useConsole = stdoutTerminal.is_terminal; break;
+    case STDERR_FILENO: useConsole = stderrTerminal.is_terminal; break;
+    default:            useConsole = false;                      break;
     }
 
     if (useConsole) {
@@ -164,8 +178,12 @@ void writeUTF8 (FILE *f, const char *s) {
 
 void detectConsole (void) {
     if (!initialized) {
-        stdoutIsConsole = isatty (STDOUT_FILENO);
-        stderrIsConsole = isatty (STDERR_FILENO);
+        stdoutTerminal.is_terminal = isatty (STDOUT_FILENO);
+        stderrTerminal.is_terminal = isatty (STDERR_FILENO);
+        /* Assume all terminals support ANSI color, even though
+         * it is not true. */
+        stdoutTerminal.supports_color = stdoutTerminal.is_terminal;
+        stderrTerminal.supports_color = stderrTerminal.is_terminal;
         errno = 0;
         initialized = true;
     }
