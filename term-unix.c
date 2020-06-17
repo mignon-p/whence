@@ -32,6 +32,26 @@
 
 typedef int (*CmpFunc) (const void*, const void*);
 
+/* We determine if the terminal supports color by comparing the TERM
+ * environment variable to a hardcoded list of terminals that are known
+ * to support color.
+ *
+ * The list was created by choosing all the terminals in
+ *   https://invisible-island.net/ncurses/terminfo.src.html
+ * that have the "setaf" capability.
+ *
+ * Terminals whose name contains "color" have been omitted from the
+ * list, because we assume all terminals whose name contains "color"
+ * support color.  So the list is just terminals that support color
+ * but don't have "color" in the name.
+ *
+ * The terminals are lexicographically sorted and stored in a
+ * fixed-width format, so that they can easily be searched with the C
+ * library function bsearch().  To optimize space a bit, there are two
+ * different lists (colorTermsShort and colorTermsLong) with different
+ * fixed widths.
+ */
+
 typedef struct TermNameShort {
     char name [10];
 } TermNameShort;

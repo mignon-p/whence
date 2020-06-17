@@ -152,6 +152,22 @@ typedef int Cache;              /* dummy */
 #endif
 
 /* Information about whether a file handle is a terminal.
+ *
+ * "is_terminal" is basically just the result of isatty().
+ *
+ * "supports_color" is only true if "is_terminal" is true, and only
+ * if the terminal is believed to support ANSI color escapes.
+ *
+ * On Windows, the terminal is believed to support color if it is
+ * possible to set the ENABLE_VIRTUAL_TERMINAL_PROCESSING flag on
+ * the console, or if that flag is already set.  (That flag is
+ * only supported on recent versions of Windows 10, so older
+ * versions of Windows will not color.)
+ *
+ * On UNIX, the terminal is believed to support color if the
+ * TERM environment variable contains the substring "color", or
+ * if the TERM environment variable is equal to one of a hardcoded
+ * list of terminal names that are known to support color.
  */
 typedef struct Terminal {
     bool is_terminal;

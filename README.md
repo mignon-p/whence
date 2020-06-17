@@ -115,6 +115,9 @@ The `ZoneId` number is mapped to a name by looking in
 * Generate correct Unicode escapes in JSON strings.
 * Support Unicode filenames on Windows.
 * Added `install-whence.sh` script for convenience on UNIX.
+* On UNIX, do not assume ANSI color is supported.  Instead, check the
+  TERM environment variable against a list of terminals known to
+  support color.
 
 ### 0.9
 
