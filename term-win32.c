@@ -73,7 +73,7 @@ static void restore_mode (void) {
     }
 }
 
-static bool save_mode (int fd, Terminal *t) {
+static void save_mode (int fd, Terminal *t) {
     if (! isatty(fd)) {
         t->is_terminal = false;
         t->supports_color = false;
