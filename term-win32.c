@@ -23,10 +23,6 @@
 
 #include "whence.h"
 
-Terminal stdoutTerminal;
-Terminal stderrTerminal;
-static bool initialized = false;
-
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
@@ -46,6 +42,10 @@ typedef struct RestoreMode {
 } RestoreMode;
 
 static RestoreMode *oldModes = NULL;
+
+Terminal stdoutTerminal;
+Terminal stderrTerminal;
+static bool initialized = false;
 
 static void add_mode (HANDLE h, DWORD mode) {
     RestoreMode *r;
@@ -169,28 +169,6 @@ void writeUTF8 (FILE *f, const char *s) {
     narrow:
         fputs (s, f);
     }
-}
-
-#else  /* _WIN32 */
-
-#include <unistd.h>
-#include <errno.h>
-
-void detectConsole (void) {
-    if (!initialized) {
-        stdoutTerminal.is_terminal = isatty (STDOUT_FILENO);
-        stderrTerminal.is_terminal = isatty (STDERR_FILENO);
-        /* Assume all terminals support ANSI color, even though
-         * it is not true. */
-        stdoutTerminal.supports_color = stdoutTerminal.is_terminal;
-        stderrTerminal.supports_color = stderrTerminal.is_terminal;
-        errno = 0;
-        initialized = true;
-    }
-}
-
-void writeUTF8 (FILE *f, const char *s) {
-    fputs (s, f);
 }
 
 #endif  /* _WIN32 */

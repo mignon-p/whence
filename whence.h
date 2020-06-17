@@ -386,7 +386,7 @@ void Cache_init (Cache *cache);
 /* Frees all of the resources referenced by a Cache structure. */
 void Cache_cleanup (Cache *cache);
 
-/* console.c ------------------------------------------------------------- */
+/* term-unix.c or term-win32.c ------------------------------------------- */
 
 /* Information about whether stdout is a terminal. */
 extern Terminal stdoutTerminal;
