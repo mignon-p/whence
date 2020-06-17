@@ -162,7 +162,7 @@ typedef int Cache;              /* dummy */
  * possible to set the ENABLE_VIRTUAL_TERMINAL_PROCESSING flag on
  * the console, or if that flag is already set.  (That flag is
  * only supported on recent versions of Windows 10, so older
- * versions of Windows will not color.)
+ * versions of Windows will not use color.)
  *
  * On UNIX, the terminal is believed to support color if the
  * TERM environment variable contains the substring "color", or
