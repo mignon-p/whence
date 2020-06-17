@@ -36,7 +36,7 @@ typedef struct TermNameShort {
     char name [10];
 } TermNameShort;
 
-static const TermNameShort colorTermsShort[/* 175 */] = {
+static const TermNameShort colorTermsShort[/* 172 */] = {
     { "386at"     },
     { "Eterm"     },
     { "alacritty" },
@@ -95,7 +95,6 @@ static const TermNameShort colorTermsShort[/* 175 */] = {
     { "darwin-f"  },
     { "darwin-f2" },
     { "decansi"   },
-    { "dg+fixed"  },
     { "djgpp"     },
     { "djgpp204"  },
     { "domterm"   },
@@ -143,7 +142,6 @@ static const TermNameShort colorTermsShort[/* 175 */] = {
     { "ncsa"      },
     { "ncsa-ns"   },
     { "netbsd6"   },
-    { "nsterm+c"  },
     { "nsterm-7"  },
     { "nsterm-c"  },
     { "nsterm-s"  },
@@ -200,7 +198,6 @@ static const TermNameShort colorTermsShort[/* 175 */] = {
     { "wsvt25m"   },
     { "xiterm"    },
     { "xnuppc"    },
-    { "xnuppc+c"  },
     { "xnuppc-b"  },
     { "xnuppc-f"  },
     { "xnuppc-f2" },
@@ -218,8 +215,7 @@ typedef struct TermNameLong {
     char name [19];
 } TermNameLong;
 
-static const TermNameLong colorTermsLong[/* 151 */] = {
-    { "alacritty+common"   },
+static const TermNameLong colorTermsLong[/* 143 */] = {
     { "alacritty-direct"   },
     { "ansi.sys-old"       },
     { "ansi80x25-raw"      },
@@ -253,7 +249,6 @@ static const TermNameLong colorTermsLong[/* 151 */] = {
     { "darwin-80x25"       },
     { "darwin-80x30"       },
     { "darwin-90x30"       },
-    { "dgunix+fixed"       },
     { "dumb-emacs-ansi"    },
     { "iTerm2.app"         },
     { "interix-nti"        },
@@ -269,7 +264,6 @@ static const TermNameLong colorTermsLong[/* 151 */] = {
     { "linux-basic"        },
     { "linux-c-nc"         },
     { "linux2.6.26"        },
-    { "mintty+common"      },
     { "mintty-direct"      },
     { "mlterm-direct"      },
     { "ms-terminal"        },
@@ -278,7 +272,6 @@ static const TermNameLong colorTermsLong[/* 151 */] = {
     { "ncr260intwan"       },
     { "ncr260intwpp"       },
     { "ncsa-vt220"         },
-    { "nsterm+c41"         },
     { "nsterm-7-c"         },
     { "nsterm-7-c-s"       },
     { "nsterm-7-s"         },
@@ -353,10 +346,6 @@ static const TermNameLong colorTermsLong[/* 151 */] = {
     { "xnuppc-80x25"       },
     { "xnuppc-80x30"       },
     { "xnuppc-90x30"       },
-    { "xterm+256setaf"     },
-    { "xterm+direct"       },
-    { "xterm+direct2"      },
-    { "xterm+indirect"     },
     { "xterm-8bit"         },
     { "xterm-basic"        },
     { "xterm-direct"       },
