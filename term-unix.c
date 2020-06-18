@@ -412,7 +412,8 @@ void detectConsole (void) {
         stdoutTerminal.supports_color = false;
         stderrTerminal.supports_color = false;
 
-        if (stdoutTerminal.is_terminal || stderrTerminal.is_terminal) {
+        if ((stdoutTerminal.is_terminal || stderrTerminal.is_terminal)
+            && ! envNoColor()) {
             const char *term = getenv ("TERM");
 
             if (term && *term && isColor (term)) {

@@ -96,6 +96,11 @@ static void save_mode (int fd, Terminal *t) {
 
     t->is_terminal = true;
 
+    if (envNoColor()) {
+        t->supports_color = false; /* user preference */
+        return;
+    }
+
     if (0 != (m & ENABLE_VIRTUAL_TERMINAL_PROCESSING)) {
         t->supports_color = true; /* already enabled */
         return;

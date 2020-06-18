@@ -293,6 +293,12 @@ size_t print_escaped_unicode (const char *s);
  */
 void setColor (FILE *f, bool useColor, int color);
 
+/* Returns true if the environment variable NO_COLOR is set to a
+ * non-empty value.  This is used by detectConsole().
+ * See https://no-color.org/
+ */
+bool envNoColor (void);
+
 /* array-list.c ---------------------------------------------------------- */
 
 /* Initializes an ArrayList structure, such that it contains the empty list. */

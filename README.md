@@ -118,6 +118,7 @@ The `ZoneId` number is mapped to a name by looking in
 * On UNIX, do not assume ANSI color is supported.  Instead, check the
   TERM environment variable against a list of terminals known to
   support color.
+* Do not use ANSI color if [NO_COLOR][9] environment variable is set.
 
 ### 0.9
 
@@ -131,3 +132,4 @@ The `ZoneId` number is mapped to a name by looking in
 [6]: https://support.microsoft.com/en-us/help/182569/internet-explorer-security-zones-registry-entries-for-advanced-users
 [7]: LICENSE
 [8]: https://sqlite.org/
+[9]: https://no-color.org/

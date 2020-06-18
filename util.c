@@ -120,3 +120,13 @@ void setColor (FILE *f, bool useColor, int color) {
         fprintf (f, "\e[%dm", color);
     }
 }
+
+bool envNoColor (void) {
+    const char *nocolor = getenv ("NO_COLOR");
+
+    if (nocolor && *nocolor) {
+        return true;
+    } else {
+        return false;
+    }
+}
