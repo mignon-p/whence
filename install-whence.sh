@@ -9,6 +9,6 @@ case $OS in
              EXE="";;
 esac
 
-mkdir -p "$PREFIX/bin" "$PREFIX/share/man/man1" || exit $?
-cp -p whence$EXE "$PREFIX/bin"                  || exit $?
-cp -p whence.1   "$PREFIX/share/man/man1"       || exit $?
+install -d -v "$PREFIX/bin" "$PREFIX/share/man/man1"  || exit $?
+install -Cpv whence$EXE      "$PREFIX/bin"            || exit $?
+install -Cpv -m 644 whence.1 "$PREFIX/share/man/man1" || exit $?
