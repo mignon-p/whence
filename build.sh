@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OS=`uname | sed -e 's/^[Mm][Ii][Nn][Gg][Ww].*/Windows/'`
+OS=`uname | sed -E -e 's/^(MINGW|CYGWIN|MSYS).*/Windows/'`
 
 case $OS in
     Darwin) exec clang -o whence \
