@@ -29,12 +29,13 @@ wget-1.20.tar.gz:
 
 ### Pre-built binaries
 
-For release [0.9](https://github.com/ppelleti/whence/releases/tag/0.9):
+For release [0.9.2](https://github.com/ppelleti/whence/releases/tag/0.9.2):
 
-* [FreeBSD, arm64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-freebsd-arm64.tar.bz2)
-* [Linux, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-linux-x86_64.tar.bz2)
-* [MacOS, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-macos-x86_64.tar.bz2)
-* [Windows, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9/whence-0.9-windows-x86_64.zip)
+* [FreeBSD, arm64](https://github.com/ppelleti/whence/releases/download/0.9.2/whence-0.9.2-freebsd-arm64.tar.bz2)
+* [Linux, armv7l](https://github.com/ppelleti/whence/releases/download/0.9.2/whence-0.9.2-linux-armv7l.tar.bz2)
+* [Linux, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9.2/whence-0.9.2-linux-x86_64.tar.bz2)
+* [MacOS, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9.2/whence-0.9.2-macos-x86_64.tar.bz2)
+* [Windows, x86\_64](https://github.com/ppelleti/whence/releases/download/0.9.2/whence-0.9.2-windows-x86_64.zip)
 
 ### Building from source
 
@@ -108,7 +109,7 @@ The `ZoneId` number is mapped to a name by looking in
 
 ## Change Log
 
-### 0.9.1 (unreleased)
+### 0.9.2
 
 * Support XDG attributes on MacOS.
 * Support `com.apple.metadata:kMDItemDownloadedDate` on MacOS.

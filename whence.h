@@ -37,9 +37,13 @@
 /* CMD_NAME is used in various error messages.  CMD_VERSION is used by
  * --version option.  CMD_VERSION is also extracted and used by
  * regenerate-manpage.sh script, to put correct version on man page.
+ *
+ * We follow the convention that if the rightmost number in
+ * CMD_VERSION is even, this is a release version, and if it is odd,
+ * this is a development version.
  */
 #define CMD_NAME "whence"
-#define CMD_VERSION "0.9.1"
+#define CMD_VERSION "0.9.2"
 
 /* Type for UTF-16 code units.  On Windows, wchar_t is 16 bits, so
  * use it for greater interoperability with Windows APIs that take
