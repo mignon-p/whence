@@ -52,7 +52,9 @@ as part of the operating system.
 On Windows, copy `whence.exe` to a directory on your `PATH`.
 
 On other platforms, copy `whence` to `/usr/local/bin` and
-copy `whence.1` to `/usr/local/share/man/man1`.
+copy `whence.1` to `/usr/local/share/man/man1`.  You can use the
+supplied `install-whence.sh` script to do this, which uses
+[install][10] to get the file permissions correct.
 
 ## Extended Attributes
 
@@ -134,3 +136,4 @@ The `ZoneId` number is mapped to a name by looking in
 [7]: LICENSE
 [8]: https://sqlite.org/
 [9]: https://no-color.org/
+[10]: https://linux.die.net/man/1/install
