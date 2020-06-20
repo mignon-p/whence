@@ -43,7 +43,7 @@
  * this is a development version.
  */
 #define CMD_NAME "whence"
-#define CMD_VERSION "0.9.2"
+#define CMD_VERSION "0.9.3"
 
 /* Type for UTF-16 code units.  On Windows, wchar_t is 16 bits, so
  * use it for greater interoperability with Windows APIs that take
